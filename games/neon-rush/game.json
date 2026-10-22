@@ -1,0 +1,19 @@
+{
+  "id": "neon-rush",
+  "title": "Neon Rush: City Escape",
+  "description": "High-velocity 3D endless runner. Dash across 3 cyber lanes, leap over laser hurdles, slide under neon barriers, and escape the grid.",
+  "category": "Action",
+  "thumbnail": "./thumbnail.webp",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "threejs",
+  "version": "1.0.0",
+  "featured": true,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-22",
+  "tags": ["3D", "Endless Runner", "Subway Surfers Style", "Three.js", "Action", "Cyberpunk", "60FPS"],
+  "controls": {
+    "desktop": "A / D or Left / Right to switch lanes · W or Up Arrow or Space to Jump · S or Down Arrow to Slide · P to Pause",
+    "mobile": "Swipe Left / Right to switch lanes · Swipe Up to Jump · Swipe Down to Slide"
+  }
+}

@@ -1,19 +1,19 @@
 {
   "id": "cyber-invaders",
   "title": "Cyber Invaders",
-  "description": "Defend the neon frontier against swarms of descending cybernetic invaders with rapid plasma cannons.",
+  "description": "Tactical space defense arcade shmup. Pilot the neon interceptor, shred descending alien fleets through destructible energy bunkers, intercept mystery UFO sweeps, and collect plasma power-ups.",
   "category": "Shooter",
   "thumbnail": "./thumbnail.webp",
   "entry": "game.js",
   "style": "game.css",
-  "engine": "phaser",
-  "version": "1.0.0",
+  "engine": "canvas",
+  "version": "2.0.0",
   "featured": true,
-  "author": "Pixel Forge",
-  "releaseDate": "2026-10-20",
-  "tags": ["Phaser 3", "Space Shooter", "Retro Arcade", "Action"],
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-22",
+  "tags": ["Space Invaders", "Retro Arcade", "Shoot Em Up", "Pixel Art", "Space Defense"],
   "controls": {
-    "desktop": "Left/Right Arrows or A/D to Move · Space to Fire · P to Pause",
-    "mobile": "Touch Left/Right sides to Move · Auto-fires while moving"
+    "desktop": "A / D or Left / Right Arrows to pilot · Spacebar to fire plasma cannons · P to Pause",
+    "mobile": "Touch Left / Right screen edges or drag joystick to maneuver · Auto-fires continuously"
   }
 }

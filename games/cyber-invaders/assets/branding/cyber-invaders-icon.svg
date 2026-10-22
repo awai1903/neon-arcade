@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="ci-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#84cc16" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <radialGradient id="ci-icon-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#84cc16" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#040b12" stop-opacity="0.95" />
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#05101a" stroke="url(#ci-icon-grad)" stroke-width="3" />
+  <rect width="128" height="128" rx="28" fill="url(#ci-icon-bg)" />
+
+  <!-- Shield Shape -->
+  <polygon points="64,16 106,36 106,88 64,112 22,88 22,36" fill="#091b26" stroke="url(#ci-icon-grad)" stroke-width="2" />
+
+  <!-- Invader Alien -->
+  <path d="M40 44 L88 44 L96 56 L90 76 L78 76 L74 68 L54 68 L50 76 L38 76 L32 56 Z" fill="#84cc16" />
+  <!-- Eyes -->
+  <rect x="46" y="52" width="10" height="7" fill="#040b12" />
+  <rect x="48" y="54" width="5" height="5" fill="#ec4899" />
+  <rect x="72" y="52" width="10" height="7" fill="#040b12" />
+  <rect x="74" y="54" width="5" height="5" fill="#ec4899" />
+
+  <!-- Antennas -->
+  <line x1="48" y1="44" x2="38" y2="30" stroke="#84cc16" stroke-width="2.5" />
+  <circle cx="38" cy="30" r="3" fill="#bef264" />
+  <line x1="80" y1="44" x2="90" y2="30" stroke="#84cc16" stroke-width="2.5" />
+  <circle cx="90" cy="30" r="3" fill="#bef264" />
+
+  <!-- Dual Cannons firing -->
+  <line x1="52" y1="82" x2="52" y2="98" stroke="#06b6d4" stroke-width="3" />
+  <line x1="76" y1="82" x2="76" y2="98" stroke="#06b6d4" stroke-width="3" />
+</svg>

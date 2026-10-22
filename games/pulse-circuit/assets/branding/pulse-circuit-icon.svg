@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="pc-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <radialGradient id="pc-icon-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#030814" stop-opacity="0.95" />
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#050d1a" stroke="url(#pc-icon-grad)" stroke-width="3" />
+  <rect width="128" height="128" rx="28" fill="url(#pc-icon-bg)" />
+
+  <!-- Octagon Circuit Frame -->
+  <polygon points="64,16 106,36 106,88 64,112 22,88 22,36" fill="#08192a" stroke="url(#pc-icon-grad)" stroke-width="2" />
+
+  <!-- Circuit Traces -->
+  <path d="M32 48 L52 48 L64 60 L80 60 L96 48" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M32 80 L52 80 L64 68 L80 68 L96 80" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" />
+  <circle cx="32" cy="48" r="4" fill="#06b6d4" />
+  <circle cx="96" cy="48" r="4" fill="#06b6d4" />
+  <circle cx="32" cy="80" r="4" fill="#8b5cf6" />
+  <circle cx="96" cy="80" r="4" fill="#8b5cf6" />
+
+  <!-- Center Micro-Core -->
+  <rect x="52" y="52" width="24" height="24" rx="5" fill="#0284c7" stroke="#38bdf8" stroke-width="2" />
+  <circle cx="64" cy="64" r="5" fill="#f59e0b" />
+</svg>

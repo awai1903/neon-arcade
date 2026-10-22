@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="nvd-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <radialGradient id="nvd-bg-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#050714" stop-opacity="0.95" />
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#070919" stroke="url(#nvd-icon-grad)" stroke-width="3" />
+  <rect width="128" height="128" rx="28" fill="url(#nvd-bg-glow)" />
+
+  <!-- Wireframe Tunnel Octagon Rings -->
+  <polygon points="64,16 102,32 112,68 94,104 64,112 34,104 16,68 26,32" fill="#0d1127" stroke="url(#nvd-icon-grad)" stroke-width="2" />
+  <polygon points="64,32 88,44 94,68 82,92 64,96 46,92 34,68 40,44" fill="none" stroke="#ec4899" stroke-width="1.5" opacity="0.6" />
+  <polygon points="64,48 76,54 80,66 74,78 64,80 54,78 48,66 52,54" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0.8" />
+
+  <!-- Perspective rays -->
+  <line x1="64" y1="66" x2="102" y2="32" stroke="#06b6d4" stroke-width="1" opacity="0.5" />
+  <line x1="64" y1="66" x2="26" y2="32" stroke="#06b6d4" stroke-width="1" opacity="0.5" />
+
+  <!-- Drifting Vector Ship -->
+  <polygon points="64,52 82,78 64,72 46,78" fill="#fef08a" stroke="#f59e0b" stroke-width="1.8" />
+  <polygon points="56,76 60,84 58,74" fill="#ec4899" />
+  <polygon points="72,76 68,84 70,74" fill="#ec4899" />
+</svg>

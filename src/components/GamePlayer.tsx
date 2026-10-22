@@ -253,22 +253,31 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             <span>All Games</span>
           </button>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-display text-lg sm:text-xl font-extrabold text-white">
-                {game.manifest.title}
-              </h1>
-              <span className="font-mono text-xs text-slate-500 hidden sm:inline">
-                v{game.manifest.version || '1.0.0'}
-              </span>
-            </div>
-            {/* Unboxed Metadata */}
-            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <span className="text-cyan-400">{game.category}</span>
-              <span aria-hidden="true" className="text-slate-600">·</span>
-              <span>{game.manifest.engine ? game.manifest.engine.toUpperCase() : 'PHASER'}</span>
-              <span aria-hidden="true" className="text-slate-600">·</span>
-              <span>By {game.manifest.author || 'AwaisGames'}</span>
+          <div className="flex items-center gap-2.5">
+            {game.iconUrl && (
+              <img
+                src={game.iconUrl}
+                alt=""
+                className="h-9 w-9 rounded-lg border border-slate-700/60 object-cover shadow-sm flex-shrink-0"
+              />
+            )}
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-display text-lg sm:text-xl font-extrabold text-white">
+                  {game.manifest.title}
+                </h1>
+                <span className="font-mono text-xs text-slate-500 hidden sm:inline">
+                  v{game.manifest.version || '1.0.0'}
+                </span>
+              </div>
+              {/* Unboxed Metadata */}
+              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                <span className="text-cyan-400">{game.category}</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>{game.manifest.engine ? game.manifest.engine.toUpperCase() : 'CANVAS'}</span>
+                <span aria-hidden="true" className="text-slate-600">·</span>
+                <span>By {game.manifest.author || 'AwaisGames'}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -433,6 +442,15 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-300 leading-relaxed">
+              {game.logoUrl && (
+                <div className="mb-3 max-w-[280px]">
+                  <img
+                    src={game.logoUrl}
+                    alt={`${game.manifest.title} Logo`}
+                    className="h-12 w-auto object-contain"
+                  />
+                </div>
+              )}
               <span className="font-semibold text-white block mb-1">About {game.manifest.title}:</span>
               <p>{game.manifest.description}</p>
             </div>

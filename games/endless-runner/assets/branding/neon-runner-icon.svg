@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="nr2-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <radialGradient id="nr2-icon-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#120417" stop-opacity="0.95" />
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#140618" stroke="url(#nr2-icon-grad)" stroke-width="3" />
+  <rect width="128" height="128" rx="28" fill="url(#nr2-icon-bg)" />
+
+  <!-- City Skyline Silhouette -->
+  <rect x="24" y="66" width="14" height="36" fill="#2e1065" opacity="0.6" />
+  <rect x="42" y="52" width="20" height="50" fill="#4c1d95" opacity="0.7" />
+  <rect x="66" y="60" width="18" height="42" fill="#2e1065" opacity="0.6" />
+  <rect x="88" y="72" width="16" height="30" fill="#1e1b4b" opacity="0.5" />
+
+  <!-- Leaping Runner -->
+  <circle cx="56" cy="38" r="7" fill="#fed7aa" />
+  <path d="M52 45 L62 62 L54 78 L44 94" stroke="#f97316" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M62 62 L80 72 L94 68" stroke="#f97316" stroke-width="3.5" stroke-linecap="round" />
+  <path d="M58 52 L42 56 L32 48" stroke="#ec4899" stroke-width="3" stroke-linecap="round" />
+  <path d="M58 52 L76 50 L88 56" stroke="#ec4899" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Speed Dash Streak -->
+  <line x1="26" y1="88" x2="40" y2="88" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" />
+  <circle cx="38" cy="90" r="3" fill="#f59e0b" />
+</svg>

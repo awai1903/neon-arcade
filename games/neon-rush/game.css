@@ -1,0 +1,283 @@
+/* Neon Rush: City Escape Scoped CSS */
+
+.neon-rush-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #060913;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* 3D Canvas element */
+.neon-rush-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+/* Intro Cinematic Banner Screen */
+.neon-rush-banner-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #060913;
+  overflow: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Gameplay Video Background Layer */
+.neon-rush-video-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.neon-rush-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.85) contrast(1.1);
+  transform: scale(1.02);
+}
+
+.neon-rush-video-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(6, 9, 19, 0.45) 0%, rgba(6, 9, 19, 0.85) 75%, #060913 100%);
+  pointer-events: none;
+}
+
+.neon-rush-video-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 9, 19, 0.7) 0%, transparent 25%, transparent 65%, #060913 100%);
+  pointer-events: none;
+}
+
+/* Banner Content */
+.neon-rush-banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.neon-rush-logo-img {
+  max-width: 440px;
+  width: 85%;
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0, 240, 255, 0.35));
+  margin-bottom: 0.75rem;
+  animation: nr-float 4s ease-in-out infinite;
+}
+
+@keyframes nr-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.neon-rush-tagline {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  max-width: 480px;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* Play Now Primary Button */
+.neon-rush-btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 50%, #a855f7 100%);
+  color: #030712;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  padding: 0.875rem 2.25rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.45), 0 4px 15px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neon-rush-btn-play:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.65), 0 6px 20px rgba(0, 0, 0, 0.6);
+  filter: brightness(1.1);
+}
+
+.neon-rush-btn-play:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Top bar indicators in banner */
+.neon-rush-banner-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  width: 100%;
+}
+
+.neon-rush-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #38bdf8;
+  backdrop-filter: blur(8px);
+}
+
+/* In-game HUD */
+.neon-rush-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+
+.neon-rush-hud-interactive {
+  pointer-events: auto;
+}
+
+.neon-rush-stat-box {
+  background: rgba(6, 9, 24, 0.75);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.neon-rush-stat-label {
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.neon-rush-stat-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* Touch Guide Prompts on Mobile */
+.neon-rush-swipe-hints {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1.5rem;
+  opacity: 0.7;
+  pointer-events: none;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  background: rgba(8, 14, 30, 0.6);
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Game Over Modal Screen */
+.neon-rush-gameover-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 6, 17, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+.neon-rush-card {
+  width: 100%;
+  max-width: 420px;
+  background: #090e24;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.neon-rush-gameover-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+
+/* Audio / Pause buttons */
+.neon-rush-ctrl-btn {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #e2e8f0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(6px);
+}
+
+.neon-rush-ctrl-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #00f0ff;
+  color: #ffffff;
+}

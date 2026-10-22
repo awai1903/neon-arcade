@@ -132,6 +132,12 @@ export function createGame(container, options = {}) {
   const HS_KEY = 'awaisgames_hs_prism-breaker';
   let highScore = parseInt(localStorage.getItem(HS_KEY) || '0', 10);
 
+  // Bespoke SVG brand identity asset
+  const logoImg = new Image();
+  if (typeof options.getAssetUrl === 'function') {
+    logoImg.src = options.getAssetUrl('assets/branding/prism-breaker-logo.svg');
+  }
+
   // Game state
   let state = 'TITLE'; // 'TITLE' | 'AIMING' | 'SHOOTING' | 'GAMEOVER' | 'PAUSED'
   let score = 0;
@@ -641,21 +647,27 @@ export function createGame(container, options = {}) {
 
     // TITLE SCREEN
     if (state === 'TITLE') {
-      ctx.fillStyle = 'rgba(4, 7, 20, 0.85)';
+      ctx.fillStyle = 'rgba(4, 7, 20, 0.88)';
       ctx.fillRect(0, 0, width, height);
 
       ctx.textAlign = 'center';
-      ctx.font = 'bold 36px Outfit, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('PRISM BREAKER 2077', width / 2, height / 2 - 30);
+      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        const logoW = Math.min(width * 0.8, 420);
+        const logoH = logoW * (140 / 540);
+        ctx.drawImage(logoImg, width / 2 - logoW / 2, height / 2 - logoH - 10, logoW, logoH);
+      } else {
+        ctx.font = 'bold 36px Outfit, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('PRISM BREAKER 2077', width / 2, height / 2 - 30);
+      }
 
       ctx.font = 'bold 16px Plus Jakarta Sans, sans-serif';
       ctx.fillStyle = '#00d4ff';
-      ctx.fillText('DRAG DOWN & RELEASE TO AIM', width / 2, height / 2 + 15);
+      ctx.fillText('DRAG DOWN & RELEASE TO AIM', width / 2, height / 2 + 25);
 
       ctx.font = '12px Plus Jakarta Sans, sans-serif';
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Shatter descending blocks before they breach the perimeter', width / 2, height / 2 + 50);
+      ctx.fillText('Shatter descending blocks before they breach the perimeter', width / 2, height / 2 + 58);
       ctx.textAlign = 'left';
     }
 

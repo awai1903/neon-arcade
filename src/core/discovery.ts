@@ -141,6 +141,18 @@ export function discoverGames(): DiscoveredGame[] {
       return gameAssets[clean] || gameAssets[`assets/${clean}`] || relativePath;
     };
 
+    // Auto-detect brand identity assets
+    let logoUrl: string | undefined = undefined;
+    let iconUrl: string | undefined = undefined;
+    for (const [key, url] of Object.entries(gameAssets)) {
+      if (key.includes('logo.svg') || key.includes('logo.png')) {
+        logoUrl = url;
+      }
+      if (key.includes('icon.svg') || key.includes('icon.png')) {
+        iconUrl = url;
+      }
+    }
+
     discovered.push({
       id: uniqueId,
       folderName,
@@ -156,6 +168,8 @@ export function discoverGames(): DiscoveredGame[] {
       loadEntryModule,
       isFeatured: Boolean(manifest.featured),
       category: manifest.category || 'Arcade',
+      logoUrl,
+      iconUrl,
     });
   }
 

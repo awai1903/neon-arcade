@@ -35,6 +35,8 @@ export interface DiscoveredGame {
   loadEntryModule: () => Promise<GameModule>;
   isFeatured: boolean;
   category: string;
+  logoUrl?: string;
+  iconUrl?: string;
 }
 
 export interface GameModule {

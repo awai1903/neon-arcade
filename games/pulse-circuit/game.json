@@ -1,17 +1,19 @@
 {
   "id": "pulse-circuit",
-  "title": "Pulse Circuit",
-  "description": "Harmonize electromagnetic frequency nodes in an overdrive arcade reflex challenge.",
+  "title": "Pulse Circuit: Overclock",
+  "description": "High-voltage electromagnetic logic puzzle. Rotate and link conductive node relays, complete circuit traces from quantum cores to terminals, and trigger harmonic overclock surges before the meltdown timer trips.",
   "category": "Puzzle",
   "thumbnail": "./thumbnail.webp",
   "entry": "game.js",
   "style": "game.css",
-  "engine": "phaser",
-  "version": "1.0.0",
-  "featured": false,
-  "author": "Circuit Dynamics",
+  "engine": "canvas",
+  "version": "2.0.0",
+  "featured": true,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-22",
+  "tags": ["Logic Gates", "Circuit Puzzle", "Cyberpunk", "Rhythm Harmonics", "Brain Teaser"],
   "controls": {
-    "desktop": "Click matching color nodes in rhythmic sequence · Space to ignite",
-    "mobile": "Tap the pulsing harmonic nodes"
+    "desktop": "Click circuit nodes to rotate 90° · Link all power traces to target terminals · Spacebar to pulse test · P to Pause",
+    "mobile": "Tap nodes to rotate connections and complete conductive pathway"
   }
 }

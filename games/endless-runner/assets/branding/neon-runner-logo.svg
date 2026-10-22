@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 140" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="nr2-grad-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="40%" stop-color="#ec4899" />
+      <stop offset="80%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="nr2-text-neon" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fed7aa" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+    <linearGradient id="nr2-text-runner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="40%" stop-color="#fbcfe8" />
+      <stop offset="80%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <filter id="nr2-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Left Running Silhouette Emblem -->
+  <g transform="translate(18, 12)">
+    <polygon points="50,4 90,24 90,76 50,96 10,76 10,24" fill="#140618" stroke="url(#nr2-grad-primary)" stroke-width="2.5" />
+    <!-- Cyber City Skyline Silhouette in emblem -->
+    <rect x="22" y="58" width="10" height="22" fill="#2e1065" opacity="0.6" />
+    <rect x="36" y="44" width="14" height="36" fill="#4c1d95" opacity="0.7" />
+    <rect x="54" y="52" width="12" height="28" fill="#2e1065" opacity="0.6" />
+    <rect x="70" y="62" width="8" height="18" fill="#1e1b4b" opacity="0.5" />
+    <!-- Leaping Runner Silhouette with Neon Streak -->
+    <path d="M42 34 A5 5 0 1 1 42 24 A5 5 0 1 1 42 34 Z" fill="#fed7aa" />
+    <path d="M40 35 L48 50 L42 64 L34 76" stroke="#f97316" stroke-width="3" stroke-linecap="round" />
+    <path d="M48 50 L62 58 L72 54" stroke="#f97316" stroke-width="3" stroke-linecap="round" />
+    <path d="M44 42 L32 46 L24 40" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M44 42 L58 40 L68 44" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round" />
+    <!-- Speed Motion Spark -->
+    <circle cx="28" cy="72" r="2.5" fill="#f59e0b" filter="url(#nr2-glow)" />
+    <circle cx="20" cy="66" r="1.5" fill="#ec4899" />
+  </g>
+
+  <!-- Wordmark "NEON RUNNER" -->
+  <g transform="translate(132, 22)">
+    <!-- Speed Grid Lines -->
+    <path d="M-8 46 L385 46" stroke="#f97316" stroke-width="1.5" stroke-dasharray="16 8" opacity="0.3" />
+    <path d="M8 64 L395 64" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="20 12" opacity="0.25" />
+
+    <!-- Subtitle Flag -->
+    <text x="2" y="24" font-family="'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="13" letter-spacing="6" fill="#fb923c">
+      CYBERPUNK 2D PARKOUR
+    </text>
+
+    <!-- "NEON" Wordmark -->
+    <text x="0" y="66" font-family="'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="46" letter-spacing="2" fill="url(#nr2-text-neon)" font-style="italic" filter="drop-shadow(0 4px 14px rgba(249, 115, 22, 0.45))">
+      NEON
+    </text>
+
+    <!-- "RUNNER" Wordmark -->
+    <text x="146" y="66" font-family="'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="46" letter-spacing="2" fill="url(#nr2-text-runner)" font-style="italic" filter="drop-shadow(0 4px 16px rgba(236, 72, 153, 0.5))">
+      RUNNER
+    </text>
+
+    <!-- "OVERDRIVE" Badge -->
+    <text x="368" y="66" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="28" letter-spacing="2" fill="#06b6d4" font-style="italic">
+      OD
+    </text>
+
+    <!-- Subtitle Bar -->
+    <g transform="translate(2, 78)">
+      <rect x="0" y="0" width="370" height="20" rx="4" fill="#1b0820" stroke="#ec4899" stroke-width="1" stroke-opacity="0.5" />
+      <circle cx="10" cy="10" r="3" fill="#f97316" />
+      <text x="22" y="14" font-family="'JetBrains Mono', monospace, sans-serif" font-weight="700" font-size="9" letter-spacing="3" fill="#fdba74">
+        DOUBLE-JUMP · LASER SLIDE · MAGNET DRONES
+      </text>
+    </g>
+  </g>
+</svg>

@@ -1,739 +1,862 @@
-import Phaser from 'phaser';
-
 /**
- * Audio Synthesizer for Retro Arcade Effects using Web Audio API
+ * Neon Runner: Overdrive — Commercial-Grade 2D Cyberpunk Parkour Runner
+ * AwaisGames Studio Handcrafted Edition
+ * Double-jump acrobatic flips, slide crouches under laser drones,
+ * multi-tier parallax neon skyline, procedural synth arpeggio, and instant restart loop.
  */
-class ArcadeAudio {
+
+class RunnerSoundEngine {
   constructor() {
     this.ctx = null;
     this.muted = false;
   }
 
-  init() {
+  ensure() {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-      }
+      if (AudioCtx) this.ctx = new AudioCtx();
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
   }
 
-  setMuted(val) {
-    this.muted = val;
+  setMuted(m) {
+    this.muted = m;
   }
 
-  playJump() {
+  playJump(isDouble = false) {
     if (this.muted) return;
-    this.init();
+    this.ensure();
     if (!this.ctx) return;
+    const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
-    const now = this.ctx.currentTime;
 
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
+    osc.type = isDouble ? 'sine' : 'triangle';
+    const startFreq = isDouble ? 340 : 200;
+    const endFreq = isDouble ? 720 : 480;
+
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.12);
 
     gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
 
     osc.connect(gain);
     gain.connect(this.ctx.destination);
-
     osc.start(now);
     osc.stop(now + 0.12);
   }
 
-  playCoin() {
+  playSlide() {
     if (this.muted) return;
-    this.init();
-    if (!this.ctx) return;
-    const now = this.ctx.currentTime;
-    [987.77, 1318.51].forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const startTime = now + idx * 0.06;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.1, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 0.1);
-    });
-  }
-
-  playHit() {
-    if (this.muted) return;
-    this.init();
+    this.ensure();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(30, now + 0.3);
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.linearRampToValueAtTime(60, now + 0.2);
 
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
 
     osc.connect(gain);
     gain.connect(this.ctx.destination);
-
     osc.start(now);
-    osc.stop(now + 0.3);
+    osc.stop(now + 0.2);
   }
 
-  playStart() {
+  playCoin() {
     if (this.muted) return;
-    this.init();
+    this.ensure();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
-    [330, 440, 554, 659].forEach((freq, idx) => {
+    [880, 1174.66].forEach((f, i) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const startTime = now + idx * 0.05;
+      const t = now + i * 0.05;
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, startTime);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f, t);
 
-      gain.gain.setValueAtTime(0.12, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.1);
+      gain.gain.setValueAtTime(0.1, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 0.1);
+      osc.start(t);
+      osc.stop(t + 0.1);
     });
+  }
+
+  playCrash() {
+    if (this.muted) return;
+    this.ensure();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
   }
 }
 
-/**
- * Endless Runner Main Phaser Scene
- */
-class MainScene extends Phaser.Scene {
-  constructor() {
-    super({ key: 'MainScene' });
-  }
-
-  init(data) {
-    this.options = data.options || {};
-    this.audio = new ArcadeAudio();
-    this.audio.setMuted(this.options.isMuted || false);
-
-    this.gameState = 'START'; // 'START' | 'PLAYING' | 'PAUSED' | 'GAMEOVER'
-    this.score = 0;
-    this.distance = 0;
-    this.coins = 0;
-    this.speed = 360;
-    this.baseSpeed = 360;
-    this.maxSpeed = 820;
-    this.jumpsLeft = 2;
-    this.highScore = parseInt(localStorage.getItem('neon_arcade_hs_runner') || '0', 10);
-  }
-
-  preload() {
-    const assets = this.options.assets || {};
-    // Load player, background, obstacle, and coin from resolved Vite URLs
-    if (assets['assets/player.png']) {
-      this.load.image('runner-player', assets['assets/player.png']);
-    }
-    if (assets['assets/background.webp']) {
-      this.load.image('runner-bg', assets['assets/background.webp']);
-    }
-    if (assets['assets/obstacle.png']) {
-      this.load.image('runner-obstacle', assets['assets/obstacle.png']);
-    }
-    if (assets['assets/coin.png']) {
-      this.load.image('runner-coin', assets['assets/coin.png']);
-    }
-  }
-
-  create() {
-    const { width, height } = this.scale;
-    this.groundY = height - 90;
-
-    // 1. Background (TileSprite or Image)
-    if (this.textures.exists('runner-bg')) {
-      this.bg = this.add.tileSprite(0, 0, width, height, 'runner-bg')
-        .setOrigin(0, 0)
-        .setDisplaySize(width, height);
-    } else {
-      // Fallback procedural background
-      this.bg = this.add.rectangle(0, 0, width, height, 0x070b14).setOrigin(0, 0);
-    }
-
-    // 2. City Grid floor
-    this.ground = this.add.rectangle(0, this.groundY, width, height - this.groundY, 0x090f20).setOrigin(0, 0);
-    this.physics.add.existing(this.ground, true);
-
-    // Neon floor line
-    this.floorGlow = this.add.line(0, 0, 0, this.groundY, width, this.groundY, 0x06b6d4, 1)
-      .setOrigin(0, 0)
-      .setLineWidth(3);
-
-    // 3. Groups for Obstacles and Coins
-    this.obstacles = this.physics.add.group();
-    this.coinsGroup = this.physics.add.group();
-
-    // 4. Player Sprite
-    if (this.textures.exists('runner-player')) {
-      this.player = this.physics.add.sprite(120, this.groundY - 32, 'runner-player');
-      this.player.setDisplaySize(48, 48);
-    } else {
-      // Fallback rectangle player
-      this.player = this.physics.add.sprite(120, this.groundY - 32, null);
-      const gfx = this.make.graphics();
-      gfx.fillStyle(0x06b6d4, 1);
-      gfx.fillRoundedRect(0, 0, 40, 48, 6);
-      gfx.generateTexture('runner-player-fallback', 40, 48);
-      gfx.destroy();
-      this.player.setTexture('runner-player-fallback');
-    }
-
-    this.player.setCollideWorldBounds(true);
-    this.player.setGravityY(1400);
-    this.player.body.setSize(34, 44);
-    this.player.body.setOffset(7, 4);
-
-    // Physics Colliders
-    this.physics.add.collider(this.player, this.ground, () => {
-      if (this.player.body.touching.down) {
-        this.jumpsLeft = 2;
-      }
-    });
-
-    this.physics.add.overlap(this.player, this.obstacles, this.handleHitObstacle, null, this);
-    this.physics.add.overlap(this.player, this.coinsGroup, this.handleCollectCoin, null, this);
-
-    // 5. Controls (Keyboard & Pointer)
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
-
-    this.input.on('pointerdown', (pointer) => {
-      // Ignore if clicking UI buttons (top right pause)
-      if (pointer.y < 60 && pointer.x > width - 100) return;
-      this.handleAction();
-    });
-
-    // 6. Particle Trail for Player
-    this.createPlayerTrail();
-
-    // 7. HUD Elements
-    this.createHUD();
-
-    // 8. Start Screen
-    this.createStartScreen();
-
-    // 9. Timers for Spawning
-    this.spawnTimer = 0;
-    this.coinTimer = 0;
-  }
-
-  createPlayerTrail() {
-    this.trailEmitter = null;
-    const particleGfx = this.make.graphics();
-    particleGfx.fillStyle(0x06b6d4, 0.8);
-    particleGfx.fillCircle(4, 4, 4);
-    particleGfx.generateTexture('player-particle', 8, 8);
-    particleGfx.destroy();
-
-    const particles = this.add.particles(0, 0, 'player-particle', {
-      speed: { min: -40, max: -120 },
-      angle: { min: 160, max: 200 },
-      scale: { start: 0.8, end: 0 },
-      alpha: { start: 0.6, end: 0 },
-      lifespan: 350,
-      frequency: 40,
-    });
-    particles.startFollow(this.player, -15, 12);
-    this.trailParticles = particles;
-  }
-
-  createHUD() {
-    const { width } = this.scale;
-    // Score & Distance Display
-    this.hudContainer = this.add.container(0, 0);
-
-    const hudBg = this.add.rectangle(0, 0, width, 54, 0x070b14, 0.65).setOrigin(0, 0);
-
-    this.scoreText = this.add.text(24, 16, 'SCORE: 0', {
-      fontSize: '18px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#06b6d4',
-    });
-
-    this.distanceText = this.add.text(180, 16, 'DIST: 0m', {
-      fontSize: '16px',
-      fontFamily: 'Outfit, sans-serif',
-      color: '#94a3b8',
-    });
-
-    this.coinsText = this.add.text(320, 16, 'TOKENS: 0', {
-      fontSize: '16px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#a855f7',
-    });
-
-    this.highScoreText = this.add.text(width - 140, 16, `BEST: ${this.highScore}`, {
-      fontSize: '16px',
-      fontFamily: 'Outfit, sans-serif',
-      color: '#ec4899',
-    });
-
-    this.hudContainer.add([hudBg, this.scoreText, this.distanceText, this.coinsText, this.highScoreText]);
-  }
-
-  createStartScreen() {
-    const { width, height } = this.scale;
-    this.startContainer = this.add.container(0, 0);
-
-    const scrim = this.add.rectangle(0, 0, width, height, 0x050813, 0.78).setOrigin(0, 0);
-
-    const title = this.add.text(width / 2, height / 2 - 70, 'NEON RUNNER', {
-      fontSize: '44px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#ffffff',
-    }).setOrigin(0.5);
-
-    const subtitle = this.add.text(width / 2, height / 2 - 16, 'TAP OR PRESS SPACE TO START', {
-      fontSize: '18px',
-      fontFamily: 'Plus Jakarta Sans, sans-serif',
-      color: '#06b6d4',
-    }).setOrigin(0.5);
-
-    this.tweens.add({
-      targets: subtitle,
-      alpha: 0.3,
-      duration: 700,
-      yoyo: true,
-      repeat: -1,
-    });
-
-    const instructions = this.add.text(
-      width / 2,
-      height / 2 + 40,
-      'Space / Tap = Jump · Double Jump Supported · P = Pause',
-      {
-        fontSize: '14px',
-        fontFamily: 'Plus Jakarta Sans, sans-serif',
-        color: '#94a3b8',
-      }
-    ).setOrigin(0.5);
-
-    this.startContainer.add([scrim, title, subtitle, instructions]);
-  }
-
-  createGameOverScreen() {
-    const { width, height } = this.scale;
-    this.gameOverContainer = this.add.container(0, 0);
-
-    const scrim = this.add.rectangle(0, 0, width, height, 0x050813, 0.85).setOrigin(0, 0);
-
-    const title = this.add.text(width / 2, height / 2 - 80, 'RUN TERMINATED', {
-      fontSize: '40px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#ec4899',
-    }).setOrigin(0.5);
-
-    const finalScore = this.add.text(width / 2, height / 2 - 24, `FINAL SCORE: ${this.score}`, {
-      fontSize: '24px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#ffffff',
-    }).setOrigin(0.5);
-
-    const isNewHigh = this.score > this.highScore;
-    if (isNewHigh) {
-      this.highScore = this.score;
-      localStorage.setItem('neon_arcade_hs_runner', this.highScore.toString());
-      this.highScoreText.setText(`BEST: ${this.highScore}`);
-    }
-
-    const hsNotice = this.add.text(
-      width / 2,
-      height / 2 + 18,
-      isNewHigh ? '★ NEW ALL-TIME RECORD! ★' : `All-Time Record: ${this.highScore}`,
-      {
-        fontSize: '16px',
-        fontFamily: 'Plus Jakarta Sans, sans-serif',
-        fontStyle: 'bold',
-        color: isNewHigh ? '#38bdf8' : '#64748b',
-      }
-    ).setOrigin(0.5);
-
-    const restartBtn = this.add.rectangle(width / 2, height / 2 + 75, 200, 48, 0x06b6d4)
-      .setInteractive({ useHandCursor: true });
-    
-    const restartText = this.add.text(width / 2, height / 2 + 75, 'PLAY AGAIN', {
-      fontSize: '16px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#070b14',
-    }).setOrigin(0.5);
-
-    restartBtn.on('pointerdown', () => this.restartGame());
-
-    const tapNotice = this.add.text(width / 2, height / 2 + 125, 'Press Space to Restart', {
-      fontSize: '13px',
-      fontFamily: 'Plus Jakarta Sans, sans-serif',
-      color: '#64748b',
-    }).setOrigin(0.5);
-
-    this.gameOverContainer.add([scrim, title, finalScore, hsNotice, restartBtn, restartText, tapNotice]);
-  }
-
-  createPauseScreen() {
-    const { width, height } = this.scale;
-    this.pauseContainer = this.add.container(0, 0);
-
-    const scrim = this.add.rectangle(0, 0, width, height, 0x050813, 0.75).setOrigin(0, 0);
-
-    const title = this.add.text(width / 2, height / 2 - 30, 'PAUSED', {
-      fontSize: '36px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#06b6d4',
-    }).setOrigin(0.5);
-
-    const resumeNotice = this.add.text(width / 2, height / 2 + 20, 'Press P or Tap to Resume', {
-      fontSize: '16px',
-      fontFamily: 'Plus Jakarta Sans, sans-serif',
-      color: '#cbd5e1',
-    }).setOrigin(0.5);
-
-    this.pauseContainer.add([scrim, title, resumeNotice]);
-  }
-
-  handleAction() {
-    if (this.gameState === 'START') {
-      this.startGame();
-    } else if (this.gameState === 'PLAYING') {
-      this.jump();
-    } else if (this.gameState === 'GAMEOVER') {
-      this.restartGame();
-    } else if (this.gameState === 'PAUSED') {
-      this.resumeGame();
-    }
-  }
-
-  startGame() {
-    this.gameState = 'PLAYING';
-    if (this.startContainer) {
-      this.startContainer.destroy();
-    }
-    this.audio.playStart();
-    if (this.options.onStateChange) {
-      this.options.onStateChange('PLAYING');
-    }
-  }
-
-  jump() {
-    if (this.jumpsLeft > 0) {
-      this.player.setVelocityY(this.jumpsLeft === 2 ? -580 : -500);
-      this.jumpsLeft--;
-      this.audio.playJump();
-
-      // Jump spin / squash effect
-      this.tweens.add({
-        targets: this.player,
-        scaleY: 1.15,
-        scaleX: 0.85,
-        duration: 100,
-        yoyo: true,
-      });
-    }
-  }
-
-  togglePause() {
-    if (this.gameState === 'PLAYING') {
-      this.gameState = 'PAUSED';
-      this.physics.pause();
-      this.createPauseScreen();
-      if (this.options.onStateChange) this.options.onStateChange('PAUSED');
-    } else if (this.gameState === 'PAUSED') {
-      this.resumeGame();
-    }
-  }
-
-  resumeGame() {
-    if (this.gameState !== 'PAUSED') return;
-    this.gameState = 'PLAYING';
-    this.physics.resume();
-    if (this.pauseContainer) {
-      this.pauseContainer.destroy();
-    }
-    if (this.options.onStateChange) this.options.onStateChange('PLAYING');
-  }
-
-  spawnObstacle() {
-    const { width } = this.scale;
-    let obstacle;
-    if (this.textures.exists('runner-obstacle')) {
-      obstacle = this.obstacles.create(width + 40, this.groundY - 24, 'runner-obstacle');
-      obstacle.setDisplaySize(38, 48);
-    } else {
-      obstacle = this.obstacles.create(width + 40, this.groundY - 24, null);
-      const gfx = this.make.graphics();
-      gfx.fillStyle(0xec4899, 1);
-      gfx.fillTriangle(0, 48, 19, 0, 38, 48);
-      gfx.generateTexture('runner-obs-fallback', 38, 48);
-      gfx.destroy();
-      obstacle.setTexture('runner-obs-fallback');
-    }
-
-    obstacle.body.setAllowGravity(false);
-    obstacle.setVelocityX(-this.speed);
-    obstacle.setImmovable(true);
-    obstacle.body.setSize(26, 40);
-  }
-
-  spawnCoin() {
-    const { width } = this.scale;
-    const yOffsets = [this.groundY - 35, this.groundY - 90, this.groundY - 140];
-    const targetY = yOffsets[Math.floor(Math.random() * yOffsets.length)];
-
-    let coin;
-    if (this.textures.exists('runner-coin')) {
-      coin = this.coinsGroup.create(width + 40, targetY, 'runner-coin');
-      coin.setDisplaySize(28, 28);
-    } else {
-      coin = this.coinsGroup.create(width + 40, targetY, null);
-      const gfx = this.make.graphics();
-      gfx.fillStyle(0x06b6d4, 1);
-      gfx.fillCircle(14, 14, 14);
-      gfx.generateTexture('runner-coin-fallback', 28, 28);
-      gfx.destroy();
-      coin.setTexture('runner-coin-fallback');
-    }
-
-    coin.body.setAllowGravity(false);
-    coin.setVelocityX(-this.speed);
-  }
-
-  handleHitObstacle() {
-    if (this.gameState !== 'PLAYING') return;
-    this.gameState = 'GAMEOVER';
-    this.physics.pause();
-    this.audio.playHit();
-
-    // Camera shake
-    this.cameras.main.shake(300, 0.025);
-
-    // Flash player
-    this.tweens.add({
-      targets: this.player,
-      tint: 0xff0055,
-      alpha: 0.4,
-      duration: 80,
-      yoyo: true,
-      repeat: 3,
-    });
-
-    this.createGameOverScreen();
-
-    if (this.options.onGameOver) {
-      this.options.onGameOver(this.score);
-    }
-    if (this.options.onStateChange) {
-      this.options.onStateChange('GAMEOVER');
-    }
-  }
-
-  handleCollectCoin(player, coin) {
-    coin.destroy();
-    this.coins += 1;
-    this.score += 50;
-    this.audio.playCoin();
-
-    // Visual score float effect
-    const floatText = this.add.text(player.x, player.y - 20, '+50', {
-      fontSize: '14px',
-      fontFamily: 'Outfit, sans-serif',
-      fontStyle: 'bold',
-      color: '#06b6d4',
-    });
-
-    this.tweens.add({
-      targets: floatText,
-      y: player.y - 50,
-      alpha: 0,
-      duration: 600,
-      onComplete: () => floatText.destroy(),
-    });
-
-    this.scoreText.setText(`SCORE: ${this.score}`);
-    this.coinsText.setText(`TOKENS: ${this.coins}`);
-    if (this.options.onScoreUpdate) {
-      this.options.onScoreUpdate(this.score);
-    }
-  }
-
-  restartGame() {
-    if (this.gameOverContainer) {
-      this.gameOverContainer.destroy();
-    }
-    this.obstacles.clear(true, true);
-    this.coinsGroup.clear(true, true);
-
-    this.score = 0;
-    this.distance = 0;
-    this.coins = 0;
-    this.speed = this.baseSpeed;
-    this.jumpsLeft = 2;
-    this.player.setPosition(120, this.groundY - 32);
-    this.player.setVelocity(0, 0);
-    this.player.clearTint();
-    this.player.alpha = 1;
-
-    this.physics.resume();
-    this.gameState = 'PLAYING';
-    this.audio.playStart();
-
-    this.scoreText.setText('SCORE: 0');
-    this.distanceText.setText('DIST: 0m');
-    this.coinsText.setText('TOKENS: 0');
-
-    if (this.options.onStateChange) {
-      this.options.onStateChange('PLAYING');
-    }
-    if (this.options.onScoreUpdate) {
-      this.options.onScoreUpdate(0);
-    }
-  }
-
-  update(time, delta) {
-    // Keyboard triggers
-    if (Phaser.Input.Keyboard.JustDown(this.spaceKey) || Phaser.Input.Keyboard.JustDown(this.upKey)) {
-      this.handleAction();
-    }
-    if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) {
-      this.togglePause();
-    }
-
-    if (this.gameState !== 'PLAYING') return;
-
-    // Scroll background
-    if (this.bg && this.bg.tilePositionX !== undefined) {
-      this.bg.tilePositionX += (this.speed * delta) / 4000;
-    }
-
-    // Distance & Progression
-    this.distance += (this.speed * delta) / 1000;
-    this.score += Math.round(delta * 0.05);
-
-    // Increase speed gradually over distance
-    if (this.speed < this.maxSpeed) {
-      this.speed = Math.min(this.maxSpeed, this.baseSpeed + this.distance * 0.04);
-    }
-
-    this.scoreText.setText(`SCORE: ${this.score}`);
-    this.distanceText.setText(`DIST: ${Math.floor(this.distance)}m`);
-
-    // Spawning obstacles
-    this.spawnTimer += delta;
-    const spawnThreshold = Math.max(1100, 2600 - this.distance * 0.4);
-    if (this.spawnTimer > spawnThreshold) {
-      this.spawnTimer = 0;
-      this.spawnObstacle();
-    }
-
-    // Spawning coins
-    this.coinTimer += delta;
-    if (this.coinTimer > 2100) {
-      this.coinTimer = 0;
-      this.spawnCoin();
-    }
-
-    // Clean up out of bounds objects
-    this.obstacles.getChildren().forEach((obs) => {
-      if (obs.x < -60) {
-        obs.destroy();
-      }
-    });
-
-    this.coinsGroup.getChildren().forEach((c) => {
-      if (c.x < -60) {
-        c.destroy();
-      }
-    });
-
-    if (this.options.onScoreUpdate && Math.floor(time) % 10 === 0) {
-      this.options.onScoreUpdate(this.score);
-    }
-  }
-}
-
-/**
- * Game Factory Contract:
- * export function createGame(container, options)
- */
 export function createGame(container, options = {}) {
-  // Clear any previous child nodes in container
   while (container.firstChild) {
     container.removeChild(container.firstChild);
   }
 
-  const config = {
-    type: Phaser.AUTO,
-    parent: container,
-    width: 800,
-    height: 480,
-    backgroundColor: '#070b14',
-    physics: {
-      default: 'arcade',
-      arcade: {
-        gravity: { y: 0, x: 0 },
-        debug: false,
-      },
-    },
-    scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-    },
-    scene: [MainScene],
+  const canvas = document.createElement('canvas');
+  canvas.className = 'w-full h-full block';
+  canvas.style.touchAction = 'none';
+  container.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const audio = new RunnerSoundEngine();
+  audio.setMuted(Boolean(options.isMuted));
+
+  let animFrameId = null;
+  let isDestroyed = false;
+  let isPaused = false;
+
+  let width = 800;
+  let height = 480;
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    const rect = container.getBoundingClientRect();
+    width = Math.max(rect.width || 800, 320);
+    height = Math.max(rect.height || 480, 320);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const HS_KEY = 'awaisgames_hs_endless-runner';
+  let highScore = parseInt(
+    localStorage.getItem(HS_KEY) || localStorage.getItem('neon_arcade_hs_runner') || '0',
+    10
+  );
+
+  const logoImg = new Image();
+  if (typeof options.getAssetUrl === 'function') {
+    logoImg.src = options.getAssetUrl('assets/branding/neon-runner-logo.svg');
+  }
+
+  let gameState = 'START'; // 'START' | 'PLAYING' | 'GAMEOVER'
+  let score = 0;
+  let distance = 0;
+  let coins = 0;
+  let speed = 400;
+  const baseSpeed = 400;
+  const maxSpeed = 950;
+
+  const groundY = () => height - 85;
+
+  // Player state
+  const player = {
+    x: 100,
+    y: 0,
+    vy: 0,
+    w: 32,
+    h: 52,
+    isGrounded: false,
+    jumpsLeft: 2,
+    isSliding: false,
+    slideTimer: 0,
+    runAnim: 0,
   };
 
-  const game = new Phaser.Game(config);
+  // Parallax Skyline Buildings
+  const buildingsLayer1 = [];
+  const buildingsLayer2 = [];
+  function initSkyline() {
+    buildingsLayer1.length = 0;
+    buildingsLayer2.length = 0;
+    for (let x = 0; x < width + 200; x += 60) {
+      buildingsLayer1.push({
+        x,
+        w: 50 + Math.random() * 40,
+        h: 120 + Math.random() * 160,
+        color: '#130d2a',
+      });
+    }
+    for (let x = 0; x < width + 200; x += 90) {
+      buildingsLayer2.push({
+        x,
+        w: 70 + Math.random() * 50,
+        h: 60 + Math.random() * 90,
+        color: '#241444',
+      });
+    }
+  }
+  initSkyline();
 
-  // Pass options to scene when boot finishes
-  game.scene.start('MainScene', { options });
+  // Obstacles & Collectibles
+  let obstacles = []; // { x, y, w, h, type: 'ground_laser' | 'hover_drone' }
+  let energyTokens = []; // { x, y, r }
+  let particles = [];
+  let floatingTexts = [];
 
-  // Expose clean wrapper interface
+  let spawnTimer = 1.2;
+
+  function resetGame() {
+    score = 0;
+    distance = 0;
+    coins = 0;
+    speed = baseSpeed;
+    player.y = groundY() - player.h;
+    player.vy = 0;
+    player.isGrounded = true;
+    player.jumpsLeft = 2;
+    player.isSliding = false;
+    obstacles = [];
+    energyTokens = [];
+    particles = [];
+    floatingTexts = [];
+    spawnTimer = 1.2;
+    gameState = 'PLAYING';
+    if (options.onStateChange) options.onStateChange('PLAYING');
+    if (options.onScoreUpdate) options.onScoreUpdate(0);
+  }
+
+  function handleJump() {
+    if (gameState === 'START' || gameState === 'GAMEOVER') {
+      resetGame();
+      return;
+    }
+    if (player.isSliding) {
+      player.isSliding = false;
+    }
+    if (player.jumpsLeft > 0) {
+      const isDouble = player.jumpsLeft === 1;
+      player.vy = -640;
+      player.isGrounded = false;
+      player.jumpsLeft -= 1;
+      audio.playJump(isDouble);
+
+      // Jet burst particles on double-jump
+      for (let i = 0; i < 8; i++) {
+        particles.push({
+          x: player.x + player.w / 2,
+          y: player.y + player.h,
+          vx: (Math.random() - 0.5) * 4,
+          vy: 2 + Math.random() * 4,
+          life: 0.5,
+          color: isDouble ? '#00f0ff' : '#f97316',
+        });
+      }
+    }
+  }
+
+  function handleSlide() {
+    if (gameState !== 'PLAYING') return;
+    if (player.isGrounded) {
+      player.isSliding = true;
+      player.slideTimer = 0.55;
+      audio.playSlide();
+
+      // Slide sparks
+      for (let i = 0; i < 6; i++) {
+        particles.push({
+          x: player.x + 10,
+          y: groundY() - 2,
+          vx: -3 - Math.random() * 5,
+          vy: -1 - Math.random() * 3,
+          life: 0.4,
+          color: '#f59e0b',
+        });
+      }
+    } else {
+      // Fast fall
+      player.vy = 750;
+    }
+  }
+
+  // Keyboard controls
+  const handleKeyDown = (e) => {
+    if (e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Space') {
+      handleJump();
+    } else if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+      handleSlide();
+    } else if (e.code === 'KeyP') {
+      isPaused = !isPaused;
+      if (options.onStateChange) options.onStateChange(isPaused ? 'PAUSED' : 'RUNNING');
+    }
+  };
+  window.addEventListener('keydown', handleKeyDown);
+
+  // Touch Controls (Swipe up = Jump, Swipe down = Slide, Tap = Jump)
+  let touchStartY = 0;
+  let touchStartX = 0;
+
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 0) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
+  });
+
+  canvas.addEventListener('touchend', (e) => {
+    if (gameState === 'START' || gameState === 'GAMEOVER') {
+      resetGame();
+      return;
+    }
+    if (e.changedTouches.length > 0) {
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      if (deltaY < -30) {
+        handleJump();
+      } else if (deltaY > 30) {
+        handleSlide();
+      } else {
+        handleJump();
+      }
+    }
+  });
+
+  canvas.addEventListener('mousedown', () => {
+    if (gameState === 'START' || gameState === 'GAMEOVER') {
+      resetGame();
+    } else {
+      handleJump();
+    }
+  });
+
+  // Main Loop
+  let lastTime = performance.now();
+
+  function tick(now) {
+    if (isDestroyed) return;
+    const dt = Math.min((now - lastTime) / 1000, 0.08);
+    lastTime = now;
+
+    if (!isPaused) {
+      update(dt);
+    }
+    render();
+
+    animFrameId = requestAnimationFrame(tick);
+  }
+
+  function update(dt) {
+    if (gameState !== 'PLAYING') return;
+
+    distance += speed * dt * 0.1;
+    speed = Math.min(maxSpeed, baseSpeed + distance * 0.35);
+    score = Math.floor(distance) + coins * 50;
+
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem(HS_KEY, highScore.toString());
+    }
+    if (options.onScoreUpdate) options.onScoreUpdate(score);
+
+    // Parallax Skyline
+    buildingsLayer1.forEach((b) => {
+      b.x -= speed * 0.15 * dt;
+      if (b.x + b.w < 0) {
+        b.x = width + Math.random() * 50;
+      }
+    });
+    buildingsLayer2.forEach((b) => {
+      b.x -= speed * 0.35 * dt;
+      if (b.x + b.w < 0) {
+        b.x = width + Math.random() * 60;
+      }
+    });
+
+    // Player Physics
+    player.runAnim += dt * (speed / 30);
+    if (!player.isGrounded) {
+      player.vy += 1550 * dt; // gravity
+      player.y += player.vy * dt;
+    }
+
+    const currentHeight = player.isSliding ? 28 : 52;
+    const floorLimit = groundY() - currentHeight;
+
+    if (player.y >= floorLimit) {
+      player.y = floorLimit;
+      player.vy = 0;
+      player.isGrounded = true;
+      player.jumpsLeft = 2;
+    }
+
+    if (player.isSliding) {
+      player.slideTimer -= dt;
+      if (player.slideTimer <= 0) {
+        player.isSliding = false;
+      }
+    }
+
+    // Footstep run particles
+    if (player.isGrounded && Math.random() < 0.3) {
+      particles.push({
+        x: player.x + 8,
+        y: groundY() - 2,
+        vx: -2 - Math.random() * 4,
+        vy: -0.5 - Math.random() * 2,
+        life: 0.35,
+        color: '#f97316',
+      });
+    }
+
+    // Spawn Obstacles & Coins
+    spawnTimer -= dt;
+    if (spawnTimer <= 0) {
+      spawnTimer = 1.1 + Math.random() * 0.9 - Math.min(0.5, distance * 0.0005);
+
+      const isHighDrone = Math.random() < 0.42;
+      if (isHighDrone) {
+        // High Hover Drone: must slide under!
+        obstacles.push({
+          x: width + 40,
+          y: groundY() - 74,
+          w: 36,
+          h: 28,
+          type: 'hover_drone',
+        });
+      } else {
+        // Ground Laser Barrier: must jump over!
+        obstacles.push({
+          x: width + 40,
+          y: groundY() - 40,
+          w: 24,
+          h: 40,
+          type: 'ground_laser',
+        });
+      }
+
+      // Add a line of 3 coins
+      for (let i = 0; i < 3; i++) {
+        energyTokens.push({
+          x: width + 100 + i * 45,
+          y: isHighDrone ? groundY() - 22 : groundY() - 85,
+          r: 9,
+          alive: true,
+        });
+      }
+    }
+
+    // Move Obstacles
+    const pBox = {
+      x: player.x + 4,
+      y: player.y + 4,
+      w: player.w - 8,
+      h: currentHeight - 6,
+    };
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const obs = obstacles[i];
+      obs.x -= speed * dt;
+
+      // Collision check
+      if (
+        pBox.x < obs.x + obs.w &&
+        pBox.x + pBox.w > obs.x &&
+        pBox.y < obs.y + obs.h &&
+        pBox.y + pBox.h > obs.y
+      ) {
+        gameState = 'GAMEOVER';
+        audio.playCrash();
+        for (let p = 0; p < 25; p++) {
+          particles.push({
+            x: player.x + player.w / 2,
+            y: player.y + player.h / 2,
+            vx: (Math.random() - 0.5) * 9,
+            vy: (Math.random() - 0.5) * 9,
+            life: 0.9,
+            color: '#ec4899',
+          });
+        }
+        if (options.onGameOver) options.onGameOver(score);
+        if (options.onStateChange) options.onStateChange('GAMEOVER');
+        break;
+      }
+
+      if (obs.x < -60) obstacles.splice(i, 1);
+    }
+
+    // Move Energy Coins
+    for (let i = energyTokens.length - 1; i >= 0; i--) {
+      const c = energyTokens[i];
+      c.x -= speed * dt;
+
+      // Pickup
+      if (
+        c.alive &&
+        Math.abs(pBox.x + pBox.w / 2 - c.x) < 22 &&
+        Math.abs(pBox.y + pBox.h / 2 - c.y) < 26
+      ) {
+        c.alive = false;
+        coins += 1;
+        audio.playCoin();
+        addFloatingText('+50', c.x, c.y - 12, '#fef08a');
+        energyTokens.splice(i, 1);
+        continue;
+      }
+
+      if (c.x < -40) energyTokens.splice(i, 1);
+    }
+
+    // Update Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= dt * 2;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // Update Floating Text
+    for (let i = floatingTexts.length - 1; i >= 0; i--) {
+      const ft = floatingTexts[i];
+      ft.y -= dt * 32;
+      ft.life -= dt * 1.2;
+      if (ft.life <= 0) floatingTexts.splice(i, 1);
+    }
+  }
+
+  function addFloatingText(text, x, y, color) {
+    floatingTexts.push({ text, x, y, life: 1, color });
+  }
+
+  function render() {
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    // Night sky gradient
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+    skyGrad.addColorStop(0, '#0c071d');
+    skyGrad.addColorStop(0.65, '#1e0c38');
+    skyGrad.addColorStop(1, '#080512');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Distant Neon Grid Horizon
+    ctx.strokeStyle = 'rgba(236, 72, 153, 0.2)';
+    ctx.lineWidth = 1;
+    for (let y = groundY() - 100; y < groundY(); y += 18) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    // Parallax Buildings
+    buildingsLayer1.forEach((b) => {
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, groundY() - b.h, b.w, b.h);
+      // Windows
+      ctx.fillStyle = 'rgba(253, 224, 71, 0.15)';
+      for (let wy = groundY() - b.h + 10; wy < groundY() - 20; wy += 22) {
+        ctx.fillRect(b.x + 8, wy, 8, 8);
+      }
+    });
+
+    buildingsLayer2.forEach((b) => {
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, groundY() - b.h, b.w, b.h);
+      // Neon roof antenna
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillRect(b.x + b.w / 2 - 1, groundY() - b.h - 14, 2, 14);
+    });
+
+    // Ground Roadway
+    ctx.fillStyle = '#0a0817';
+    ctx.fillRect(0, groundY(), width, height - groundY());
+
+    // Neon Curbs & Grid lines
+    ctx.strokeStyle = '#ec4899';
+    ctx.shadowColor = '#ec4899';
+    ctx.shadowBlur = 10;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY());
+    ctx.lineTo(width, groundY());
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Road dashes
+    ctx.strokeStyle = '#f97316';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([20, 24]);
+    ctx.beginPath();
+    ctx.moveTo(0, groundY() + 25);
+    ctx.lineTo(width, groundY() + 25);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Obstacles
+    obstacles.forEach((obs) => {
+      ctx.save();
+      if (obs.type === 'hover_drone') {
+        // High drone
+        ctx.fillStyle = '#00f0ff';
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 6);
+        ctx.fill();
+        // Red sensor eye
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(obs.x + 10, obs.y + 10, 8, 8);
+        // Warning laser beam downwards
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(obs.x + obs.w / 2, obs.y + obs.h);
+        ctx.lineTo(obs.x + obs.w / 2, groundY());
+        ctx.stroke();
+      } else {
+        // Ground barrier
+        ctx.fillStyle = '#f97316';
+        ctx.shadowColor = '#f97316';
+        ctx.shadowBlur = 12;
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        // Laser hazard stripes
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(obs.x + 4, obs.y + 4, obs.w - 8, 4);
+        ctx.fillRect(obs.x + 4, obs.y + 16, obs.w - 8, 4);
+      }
+      ctx.restore();
+    });
+
+    // Energy Tokens (Coins)
+    energyTokens.forEach((c) => {
+      if (!c.alive) return;
+      ctx.save();
+      ctx.fillStyle = '#fef08a';
+      ctx.shadowColor = '#fef08a';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Player
+    drawPlayer();
+
+    // Particles
+    particles.forEach((p) => {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+    });
+    ctx.globalAlpha = 1;
+
+    // Floating text
+    floatingTexts.forEach((ft) => {
+      ctx.globalAlpha = Math.max(0, ft.life);
+      ctx.font = 'bold 15px "Outfit", sans-serif';
+      ctx.fillStyle = ft.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(ft.text, ft.x, ft.y);
+    });
+    ctx.globalAlpha = 1;
+
+    // HUD
+    renderHUD();
+
+    // Overlays
+    if (gameState === 'START') {
+      renderStartOverlay();
+    } else if (gameState === 'GAMEOVER') {
+      renderGameOverOverlay();
+    }
+
+    ctx.restore();
+  }
+
+  function drawPlayer() {
+    ctx.save();
+    ctx.translate(player.x, player.y);
+
+    if (player.isSliding) {
+      // Sliding crouch pose
+      ctx.fillStyle = '#f97316';
+      ctx.shadowColor = '#f97316';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.roundRect(0, 10, player.w + 14, 20, 6);
+      ctx.fill();
+      // Head
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(player.w + 6, 18, 7, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Running / Jumping upright pose
+      ctx.fillStyle = '#f97316';
+      ctx.shadowColor = '#f97316';
+      ctx.shadowBlur = 10;
+
+      // Torso
+      ctx.fillRect(8, 14, 18, 22);
+
+      // Head with cyber visor
+      ctx.fillStyle = '#fed7aa';
+      ctx.beginPath();
+      ctx.arc(17, 8, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(16, 6, 8, 4);
+
+      // Running legs
+      const legPhase = Math.sin(player.runAnim);
+      ctx.strokeStyle = '#ec4899';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+
+      if (player.isGrounded) {
+        ctx.beginPath();
+        ctx.moveTo(12, 36);
+        ctx.lineTo(12 - legPhase * 10, 50);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(22, 36);
+        ctx.lineTo(22 + legPhase * 10, 50);
+        ctx.stroke();
+      } else {
+        // Airborne jump tuck
+        ctx.beginPath();
+        ctx.moveTo(12, 36);
+        ctx.lineTo(6, 46);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(22, 36);
+        ctx.lineTo(28, 44);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function renderHUD() {
+    ctx.fillStyle = 'rgba(7, 4, 18, 0.85)';
+    ctx.fillRect(0, 0, width, 40);
+    ctx.strokeStyle = '#1e1b4b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 40);
+    ctx.lineTo(width, 40);
+    ctx.stroke();
+
+    ctx.font = 'bold 15px "Outfit", sans-serif';
+    ctx.fillStyle = '#f97316';
+    ctx.textAlign = 'left';
+    ctx.fillText(`SCORE: ${score}`, 20, 25);
+
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillText(`DIST: ${Math.floor(distance)}m`, 170, 25);
+
+    ctx.fillStyle = '#fef08a';
+    ctx.fillText(`COINS: ${coins}`, 310, 25);
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'right';
+    ctx.fillText(`BEST: ${highScore}`, width - 20, 25);
+  }
+
+  function renderStartOverlay() {
+    ctx.fillStyle = 'rgba(8, 4, 18, 0.88)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.textAlign = 'center';
+    if (logoImg.complete && logoImg.naturalWidth > 0) {
+      const logoW = Math.min(width * 0.75, 420);
+      const logoH = logoW * (140 / 540);
+      ctx.drawImage(logoImg, width / 2 - logoW / 2, height / 2 - logoH - 15, logoW, logoH);
+    } else {
+      ctx.font = 'bold 36px "Outfit", sans-serif';
+      ctx.fillStyle = '#f97316';
+      ctx.shadowColor = '#f97316';
+      ctx.shadowBlur = 14;
+      ctx.fillText('NEON RUNNER: OVERDRIVE', width / 2, height / 2 - 40);
+    }
+
+    ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowBlur = 0;
+    ctx.fillText('TAP OR PRESS SPACE TO SPRINT', width / 2, height / 2 + 25);
+
+    ctx.font = '12px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('W / Up / Space = Jump (Double Tap for Flip) · S / Down = Slide Under Drones', width / 2, height / 2 + 58);
+  }
+
+  function renderGameOverOverlay() {
+    ctx.fillStyle = 'rgba(8, 4, 18, 0.9)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 34px "Outfit", sans-serif';
+    ctx.fillStyle = '#ec4899';
+    ctx.shadowColor = '#ec4899';
+    ctx.shadowBlur = 16;
+    ctx.fillText('RUN CRASHED', width / 2, height / 2 - 45);
+
+    ctx.font = 'bold 20px "Outfit", sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 0;
+    ctx.fillText(`FINAL SCORE: ${score} · DISTANCE: ${Math.floor(distance)}m`, width / 2, height / 2 - 10);
+
+    const isRecord = score >= highScore && score > 0;
+    ctx.font = '13px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = isRecord ? '#00f0ff' : '#64748b';
+    ctx.fillText(isRecord ? '★ NEW ALL-TIME RECORD! ★' : `Personal Best: ${highScore}`, width / 2, height / 2 + 20);
+
+    // Instant retry
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.roundRect(width / 2 - 90, height / 2 + 48, 180, 42, 8);
+    ctx.fill();
+
+    ctx.font = 'bold 14px "Outfit", sans-serif';
+    ctx.fillStyle = '#080412';
+    ctx.fillText('ONE MORE RUN', width / 2, height / 2 + 74);
+  }
+
+  // Start ticking
+  animFrameId = requestAnimationFrame(tick);
+
   return {
-    gameInstance: game,
-    pause: () => {
-      const scene = game.scene.getScene('MainScene');
-      if (scene && scene.togglePause) scene.togglePause();
-    },
-    resume: () => {
-      const scene = game.scene.getScene('MainScene');
-      if (scene && scene.resumeGame) scene.resumeGame();
-    },
-    restart: () => {
-      const scene = game.scene.getScene('MainScene');
-      if (scene && scene.restartGame) scene.restartGame();
-    },
-    destroy: (removeCanvas = true) => {
-      try {
-        game.destroy(removeCanvas);
-      } catch (e) {
-        console.warn('Game cleanup:', e);
+    gameInstance: canvas,
+    pause: () => { isPaused = true; },
+    resume: () => { isPaused = false; },
+    restart: () => { resetGame(); },
+    setMuted: (m) => { audio.setMuted(m); },
+    destroy: () => {
+      isDestroyed = true;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('keydown', handleKeyDown);
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
       }
     },
   };

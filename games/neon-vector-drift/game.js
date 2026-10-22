@@ -162,6 +162,12 @@ export function createGame(container, options = {}) {
   const HS_KEY = 'awaisgames_hs_neon-vector-drift';
   let highScore = parseInt(localStorage.getItem(HS_KEY) || '0', 10);
 
+  // Bespoke SVG brand identity asset
+  const logoImg = new Image();
+  if (typeof options.getAssetUrl === 'function') {
+    logoImg.src = options.getAssetUrl('assets/branding/neon-vector-drift-logo.svg');
+  }
+
   // Game state
   let state = 'TITLE'; // 'TITLE' | 'PLAYING' | 'PAUSED' | 'GAMEOVER'
   let score = 0;
@@ -687,21 +693,27 @@ export function createGame(container, options = {}) {
 
     // TITLE SCREEN
     if (state === 'TITLE') {
-      ctx.fillStyle = 'rgba(3, 6, 17, 0.82)';
+      ctx.fillStyle = 'rgba(3, 6, 17, 0.85)';
       ctx.fillRect(0, 0, width, height);
 
       ctx.textAlign = 'center';
-      ctx.font = 'bold 36px Outfit, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('NEON VECTOR DRIFT', cx, cy - 40);
+      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        const logoW = Math.min(width * 0.75, 420);
+        const logoH = logoW * (140 / 540);
+        ctx.drawImage(logoImg, cx - logoW / 2, cy - logoH - 15, logoW, logoH);
+      } else {
+        ctx.font = 'bold 36px Outfit, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('NEON VECTOR DRIFT', cx, cy - 40);
+      }
 
       ctx.font = 'bold 16px Plus Jakarta Sans, sans-serif';
       ctx.fillStyle = '#00d4ff';
-      ctx.fillText('TAP OR PRESS SPACE TO LAUNCH', cx, cy + 8);
+      ctx.fillText('TAP OR PRESS SPACE TO LAUNCH', cx, cy + 28);
 
       ctx.font = '12px Plus Jakarta Sans, sans-serif';
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Drag / Arrow Keys to Steer · Double-Tap / Space for Emergency Shield Pulse', cx, cy + 46);
+      ctx.fillText('Drag / Arrow Keys to Steer · Double-Tap / Space for Emergency Shield Pulse', cx, cy + 62);
       ctx.textAlign = 'left';
     }
 

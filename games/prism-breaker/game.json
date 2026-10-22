@@ -1,17 +1,17 @@
 {
   "id": "prism-breaker",
   "title": "Prism Breaker 2077",
-  "description": "Cyberpunk physics block-breaker. Aim precision laser orbs, trigger dynamic synth-wave color combos, and shatter descending prism nodes.",
+  "description": "Cyberpunk physics block-breaker. Aim precision laser trajectory beams, shatter descending prism nodes, trigger cascading combo color-shifts, and collect dynamic multi-ball power-ups.",
   "category": "Puzzle",
   "thumbnail": "./thumbnail.webp",
   "entry": "game.js",
   "style": "game.css",
   "engine": "canvas",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "featured": true,
   "author": "AwaisGames Studio",
   "releaseDate": "2026-10-22",
-  "tags": ["Brick Breaker", "99 Balls", "Physics", "Synthwave", "Combo Streaks"],
+  "tags": ["Brick Breaker", "99 Balls", "Physics", "Synthwave", "Combo Streaks", "Cyberpunk"],
   "controls": {
     "desktop": "Drag mouse to aim trajectory beam · Release to fire orbs · Space to fast-forward · P to Pause",
     "mobile": "Touch & drag to aim laser guide · Lift finger to launch wave"

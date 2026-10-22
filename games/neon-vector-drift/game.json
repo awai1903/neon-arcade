@@ -1,17 +1,17 @@
 {
   "id": "neon-vector-drift",
   "title": "Neon Vector Drift",
-  "description": "High-octane neon wireframe tunnel rush. Drift through rotating geometric sectors, collect hyper-shards, and trigger tactical Shield Pulses.",
+  "description": "High-octane neon wireframe tunnel rush. Drift through rotating geometric sectors, collect hyper-shards, engage tactical Shield Pulses, and experience butter-smooth 60+ FPS action.",
   "category": "Arcade",
   "thumbnail": "./thumbnail.webp",
   "entry": "game.js",
   "style": "game.css",
   "engine": "canvas",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "featured": true,
   "author": "AwaisGames Studio",
   "releaseDate": "2026-10-22",
-  "tags": ["Tunnel Rush", "Space Waves", "Neon", "60FPS", "High Speed"],
+  "tags": ["Tunnel Rush", "Space Waves", "Neon", "60FPS", "High Speed", "Drift"],
   "controls": {
     "desktop": "A / D or Left / Right Arrows (or Mouse Drag) to steer · Spacebar for Shield Pulse · P to Pause",
     "mobile": "Smooth Drag to steer with zero latency · Quick Double-Tap for Shield Pulse"
