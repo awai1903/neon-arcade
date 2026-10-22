@@ -1,0 +1,19 @@
+{
+  "id": "endless-runner",
+  "title": "Neon Runner",
+  "description": "Sprint through a cyberpunk cityscape, leap over electrified barriers, collect energy tokens, and set high scores.",
+  "category": "Arcade",
+  "thumbnail": "./thumbnail.webp",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "phaser",
+  "version": "1.0.0",
+  "featured": true,
+  "author": "Neon Labs",
+  "releaseDate": "2026-10-15",
+  "tags": ["Phaser 3", "Endless Runner", "Cyberpunk", "Action"],
+  "controls": {
+    "desktop": "Space or Up Arrow to Jump · P to Pause",
+    "mobile": "Tap anywhere on the game screen to Jump"
+  }
+}

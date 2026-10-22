@@ -1,0 +1,17 @@
+{
+  "id": "pulse-circuit",
+  "title": "Pulse Circuit",
+  "description": "Harmonize electromagnetic frequency nodes in an overdrive arcade reflex challenge.",
+  "category": "Puzzle",
+  "thumbnail": "./thumbnail.webp",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "phaser",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "Circuit Dynamics",
+  "controls": {
+    "desktop": "Click matching color nodes in rhythmic sequence · Space to ignite",
+    "mobile": "Tap the pulsing harmonic nodes"
+  }
+}

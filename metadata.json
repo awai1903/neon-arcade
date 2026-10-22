@@ -1,0 +1,6 @@
+{
+  "name": "NEON ARCADE",
+  "description": "Premium browser gaming portal with automatic GitHub game discovery and Phaser 3 games.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

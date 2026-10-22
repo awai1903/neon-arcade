@@ -1,0 +1,19 @@
+{
+  "id": "cyber-invaders",
+  "title": "Cyber Invaders",
+  "description": "Defend the neon frontier against swarms of descending cybernetic invaders with rapid plasma cannons.",
+  "category": "Shooter",
+  "thumbnail": "./thumbnail.webp",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "phaser",
+  "version": "1.0.0",
+  "featured": true,
+  "author": "Pixel Forge",
+  "releaseDate": "2026-10-20",
+  "tags": ["Phaser 3", "Space Shooter", "Retro Arcade", "Action"],
+  "controls": {
+    "desktop": "Left/Right Arrows or A/D to Move · Space to Fire · P to Pause",
+    "mobile": "Touch Left/Right sides to Move · Auto-fires while moving"
+  }
+}
