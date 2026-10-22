@@ -43,7 +43,7 @@ function normalizeRelativePath(folder: string, relativePath: string): string {
 function validateManifest(raw: any, folder: string): GameManifest | null {
   const data = raw?.default || raw;
   if (!data || typeof data !== 'object') {
-    console.warn(`[Neon Arcade] Invalid game.json in folder "games/${folder}"`);
+    console.warn(`[AwaisGames] Invalid game.json in folder "games/${folder}"`);
     return null;
   }
 
@@ -84,7 +84,7 @@ export function discoverGames(): DiscoveredGame[] {
     // Prevent duplicate IDs
     let uniqueId = manifest.id;
     if (seenIds.has(uniqueId)) {
-      console.warn(`[Neon Arcade] Duplicate game ID detected: "${uniqueId}". Appending folder suffix.`);
+      console.warn(`[AwaisGames] Duplicate game ID detected: "${uniqueId}". Appending folder suffix.`);
       uniqueId = `${manifest.id}-${folderName}`;
     }
     seenIds.add(uniqueId);

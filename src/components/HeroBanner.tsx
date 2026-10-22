@@ -85,8 +85,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         <div className="lg:col-span-4 flex flex-col justify-between gap-3">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
-              <Flame className="h-3.5 w-3.5 text-orange-400" />
-              <span>Trending Now</span>
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Spotlight Picks</span>
             </div>
             <span className="text-[11px] text-slate-500 font-mono">Instant Play</span>
           </div>
