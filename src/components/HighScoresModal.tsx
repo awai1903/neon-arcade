@@ -21,7 +21,7 @@ export const HighScoresModal: React.FC<HighScoresModalProps> = ({
     if (!isOpen) return;
     const currentScores: Record<string, number> = {};
     games.forEach((g) => {
-      const stored = localStorage.getItem(`neon_arcade_hs_${g.id}`);
+      const stored = localStorage.getItem(`awaisgames_hs_${g.id}`) || localStorage.getItem(`neon_arcade_hs_${g.id}`);
       currentScores[g.id] = stored ? parseInt(stored, 10) : 0;
     });
     setScores(currentScores);
@@ -30,13 +30,14 @@ export const HighScoresModal: React.FC<HighScoresModalProps> = ({
   if (!isOpen) return null;
 
   const handleReset = (id: string) => {
+    localStorage.removeItem(`awaisgames_hs_${id}`);
     localStorage.removeItem(`neon_arcade_hs_${id}`);
     setScores((prev) => ({ ...prev, [id]: 0 }));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-800 bg-[#0c1324] p-6 shadow-2xl">
+      <div className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-800 bg-[#0a0f20] p-6 shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400 ring-1 ring-purple-500/30">

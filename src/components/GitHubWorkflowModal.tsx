@@ -51,7 +51,7 @@ class SceneA extends Phaser.Scene {
 }
 
 /**
- * Standard Neon Arcade Contract
+ * Standard AwaisGames Game Contract
  */
 export function createGame(container, options = {}) {
   const config = {
@@ -59,7 +59,7 @@ export function createGame(container, options = {}) {
     parent: container,
     width: 800,
     height: 480,
-    backgroundColor: '#070b14',
+    backgroundColor: '#060913',
     scene: [SceneA]
   };
 
@@ -75,7 +75,7 @@ export function createGame(container, options = {}) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-[#0c1324] p-6 shadow-2xl">
+      <div className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-800 bg-[#0a0f20] p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">

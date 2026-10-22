@@ -5,18 +5,22 @@
   --font-body: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --color-arcade-bg: #070b14;
-  --color-arcade-card: #0d1527;
-  --color-arcade-card-hover: #131f38;
-  --color-arcade-border: #1e2b4a;
-  --color-arcade-cyan: #06b6d4;
-  --color-arcade-purple: #a855f7;
-  --color-arcade-pink: #ec4899;
+  --color-brand-bg: #060913;
+  --color-brand-surface: #0a0f20;
+  --color-brand-card: #0e152d;
+  --color-brand-card-hover: #131c3c;
+  --color-brand-border: #1a2342;
+  --color-brand-cyan: #00d4ff;
+  --color-brand-violet: #8b5cf6;
+}
+
+:root {
+  color-scheme: dark;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: #070b14;
+  background-color: #060913;
   color: #f1f5f9;
   min-height: 100vh;
   overflow-x: hidden;
@@ -30,26 +34,45 @@ h1, h2, h3, h4, .font-display {
   font-variant-numeric: tabular-nums;
 }
 
-/* Subtle arcade background grid */
-.bg-arcade-grid {
-  background-size: 32px 32px;
+/* Subtle, performance-friendly background grid pattern */
+.bg-subtle-grid {
+  background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
-/* Custom scrollbar for game container and site */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #070b14;
+  background: #060913;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2b4a;
+  background: #1a2342;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2b3966;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus styles for keyboard navigation accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #00d4ff;
+  outline-offset: 2px;
 }

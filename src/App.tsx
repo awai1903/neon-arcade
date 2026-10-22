@@ -1,126 +1,209 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { gameCatalogue, getAllCategories, getGameById } from './core/discovery';
+import { getCurrentRoute, navigateTo, updateSEO } from './core/router';
 import type { DiscoveredGame } from './types/game';
 import { Navbar } from './components/Navbar';
 import { HeroBanner } from './components/HeroBanner';
+import { RecentlyPlayed, type RecentGameItem } from './components/RecentlyPlayed';
 import { GameGrid } from './components/GameGrid';
 import { GamePlayer } from './components/GamePlayer';
 import { GitHubWorkflowModal } from './components/GitHubWorkflowModal';
 import { GameDetailsModal } from './components/GameDetailsModal';
 import { HighScoresModal } from './components/HighScoresModal';
+import { LegalModals } from './components/LegalModals';
 import { NotFound } from './components/NotFound';
 import { Footer } from './components/Footer';
+
+const RECENT_GAMES_STORAGE_KEY = 'awaisgames_recent_games';
+const LEGACY_STORAGE_KEY = 'neon_arcade_recent_games';
 
 export default function App() {
   const [games] = useState<DiscoveredGame[]>(gameCatalogue);
   const categories = useMemo(() => getAllCategories(), []);
-  
+
   // Route state
   const [currentRoute, setCurrentRoute] = useState<'home' | 'game' | 'not-found'>('home');
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
+
+  // Search and Category state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   // Modals state
   const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [isHighScoresOpen, setIsHighScoresOpen] = useState(false);
   const [inspectedGame, setInspectedGame] = useState<DiscoveredGame | null>(null);
+  const [legalModalType, setLegalModalType] = useState<'about' | 'privacy' | 'contact' | null>(null);
 
-  // Parse route from hash or URL
-  const parseRoute = () => {
-    const hash = window.location.hash.replace(/^#\/?/, '');
-    const searchParams = new URLSearchParams(window.location.search);
-    const queryGame = searchParams.get('game');
-
-    let gameIdToLoad: string | null = null;
-
-    if (hash.startsWith('game/')) {
-      gameIdToLoad = hash.replace('game/', '').trim();
-    } else if (queryGame) {
-      gameIdToLoad = queryGame.trim();
-    }
-
-    if (gameIdToLoad) {
-      const match = getGameById(gameIdToLoad);
-      if (match) {
-        setActiveGameId(match.id);
-        setCurrentRoute('game');
-        document.title = `${match.manifest.title} — NEON ARCADE`;
-      } else {
-        setActiveGameId(gameIdToLoad);
-        setCurrentRoute('not-found');
-        document.title = `Game Not Found — NEON ARCADE`;
+  // Recently played state
+  const [recentRaw, setRecentRaw] = useState<{ id: string; timestamp: number }[]>(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_GAMES_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed.slice(0, 3);
+        }
       }
-    } else {
-      setActiveGameId(null);
-      setCurrentRoute('home');
-      document.title = 'NEON ARCADE — Automatic GitHub Game Discovery';
+    } catch (e) {
+      console.warn('Recent games load error:', e);
+    }
+    return [];
+  });
+
+  const recordRecentPlay = useCallback((gameId: string) => {
+    try {
+      setRecentRaw((prev) => {
+        const filtered = prev.filter((r) => r.id !== gameId);
+        const updated = [{ id: gameId, timestamp: Date.now() }, ...filtered].slice(0, 3);
+        localStorage.setItem(RECENT_GAMES_STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    } catch (e) {
+      console.warn('Record recent error:', e);
+    }
+  }, []);
+
+  const handleClearRecent = () => {
+    try {
+      localStorage.removeItem(RECENT_GAMES_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      setRecentRaw([]);
+    } catch (e) {
+      console.warn('Clear recent error:', e);
     }
   };
 
+  const recentGamesList: RecentGameItem[] = useMemo(() => {
+    return recentRaw
+      .map((item) => {
+        const match = getGameById(item.id);
+        return match ? { game: match, timestamp: item.timestamp } : null;
+      })
+      .filter((item): item is RecentGameItem => item !== null);
+  }, [recentRaw]);
+
+  // Synchronize route with current URL
+  const syncRoute = useCallback(() => {
+    const route = getCurrentRoute();
+    if (route.view === 'game' && route.gameId) {
+      const game = getGameById(route.gameId);
+      if (game) {
+        setActiveGameId(game.id);
+        setCurrentRoute('game');
+        recordRecentPlay(game.id);
+        updateSEO(game);
+        return;
+      }
+    }
+
+    if (route.view === 'not-found' && route.gameId) {
+      setActiveGameId(route.gameId);
+      setCurrentRoute('not-found');
+      updateSEO(undefined);
+      return;
+    }
+
+    // Default: Home view
+    setActiveGameId(null);
+    setCurrentRoute('home');
+    if (route.category) {
+      setActiveCategory(route.category);
+    }
+    updateSEO(undefined);
+  }, [recordRecentPlay]);
+
   useEffect(() => {
-    parseRoute();
-    const handlePopState = () => parseRoute();
+    syncRoute();
+    const handlePopState = () => syncRoute();
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('hashchange', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('hashchange', handlePopState);
     };
-  }, []);
+  }, [syncRoute]);
 
   const navigateToGame = (id: string) => {
-    window.location.hash = `game/${id}`;
-    const target = getGameById(id);
-    if (target) {
-      setActiveGameId(target.id);
+    const game = getGameById(id);
+    if (game) {
+      setActiveGameId(game.id);
       setCurrentRoute('game');
-      document.title = `${target.manifest.title} — NEON ARCADE`;
+      recordRecentPlay(game.id);
+      navigateTo(`/games/${game.id}`, game);
     } else {
       setActiveGameId(id);
       setCurrentRoute('not-found');
+      navigateTo(`/games/${id}`, undefined);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const navigateHome = () => {
-    window.location.hash = '';
     setActiveGameId(null);
     setCurrentRoute('home');
-    document.title = 'NEON ARCADE — Automatic GitHub Game Discovery';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateTo('/', undefined);
   };
 
   const featuredGame = useMemo(() => {
     return games.find((g) => g.isFeatured) || games[0];
   }, [games]);
 
+  const topGames = useMemo(() => {
+    return games.filter((g) => g.id !== featuredGame?.id);
+  }, [games, featuredGame]);
+
   const activeGame = useMemo(() => {
     return activeGameId ? getGameById(activeGameId) : undefined;
   }, [activeGameId]);
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans">
-      {/* Top Navbar Contract */}
+    <div className="min-h-screen bg-[#060913] text-slate-100 flex flex-col font-sans">
+      {/* Top Navbar */}
       <Navbar
         onNavigateHome={navigateHome}
+        onSelectGame={navigateToGame}
         onOpenDocs={() => setIsDocsOpen(true)}
         onOpenHighScores={() => setIsHighScoresOpen(true)}
-        gameCount={games.length}
-        currentRoute={currentRoute}
+        games={games}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+        categories={categories}
       />
 
-      {/* Main Content Area */}
+      {/* Main View Area */}
       <main className="flex-1">
         {currentRoute === 'home' && (
           <>
-            <HeroBanner
-              featuredGame={featuredGame}
-              onPlayGame={navigateToGame}
-              onOpenDocs={() => setIsDocsOpen(true)}
-            />
-            <div id="featured-section" />
+            {/* Compact Poki/CrazyGames-style Action Hero */}
+            {!searchQuery && (
+              <HeroBanner
+                featuredGame={featuredGame}
+                topGames={topGames}
+                onPlayGame={navigateToGame}
+                onShowInfo={(game) => setInspectedGame(game)}
+              />
+            )}
+
+            {/* Persistent Recently Played Strip (Last 3 games) */}
+            {!searchQuery && (
+              <RecentlyPlayed
+                recentGames={recentGamesList}
+                onPlayGame={navigateToGame}
+                onClearRecent={handleClearRecent}
+                onShowInfo={(game) => setInspectedGame(game)}
+              />
+            )}
+
+            {/* Primary Game Catalogue Grid */}
             <GameGrid
               games={games}
               categories={categories}
+              activeCategory={activeCategory}
+              onSelectCategory={setActiveCategory}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
               onPlayGame={navigateToGame}
               onShowInfo={(game) => setInspectedGame(game)}
               onOpenDocs={() => setIsDocsOpen(true)}
@@ -131,7 +214,9 @@ export default function App() {
         {currentRoute === 'game' && activeGame && (
           <GamePlayer
             game={activeGame}
+            allGames={games}
             onBack={navigateHome}
+            onPlayGame={navigateToGame}
             onOpenDocs={() => setIsDocsOpen(true)}
           />
         )}
@@ -148,9 +233,15 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer onOpenDocs={() => setIsDocsOpen(true)} gameCount={games.length} />
+      <Footer
+        onOpenDocs={() => setIsDocsOpen(true)}
+        onOpenAbout={() => setLegalModalType('about')}
+        onOpenPrivacy={() => setLegalModalType('privacy')}
+        onOpenContact={() => setLegalModalType('contact')}
+        gameCount={games.length}
+      />
 
-      {/* Interactive GitOps & CI/CD Documentation Modal */}
+      {/* GitHub GitOps Spec Modal */}
       <GitHubWorkflowModal
         isOpen={isDocsOpen}
         onClose={() => setIsDocsOpen(false)}
@@ -163,12 +254,18 @@ export default function App() {
         onPlay={navigateToGame}
       />
 
-      {/* Arcade High Scores Modal */}
+      {/* High Scores Modal */}
       <HighScoresModal
         isOpen={isHighScoresOpen}
         onClose={() => setIsHighScoresOpen(false)}
         games={games}
         onPlayGame={navigateToGame}
+      />
+
+      {/* Legal & About Modals */}
+      <LegalModals
+        modalType={legalModalType}
+        onClose={() => setLegalModalType(null)}
       />
     </div>
   );

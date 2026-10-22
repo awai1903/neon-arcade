@@ -46,9 +46,9 @@ export const NotFound: React.FC<NotFoundProps> = ({
 
         <button
           onClick={onOpenDocs}
-          className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#0d1527] px-5 py-2.5 text-xs font-medium text-slate-300 hover:text-white active:scale-95"
+          className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#0a0f20] px-5 py-2.5 text-xs font-medium text-slate-300 hover:text-white active:scale-95"
         >
-          <FolderGit2 className="h-4 w-4 text-purple-400" />
+          <FolderGit2 className="h-4 w-4 text-violet-400" />
           <span>CI/CD Spec</span>
         </button>
       </div>
@@ -64,7 +64,7 @@ export const NotFound: React.FC<NotFoundProps> = ({
               <div
                 key={g.id}
                 onClick={() => onPlayGame(g.id)}
-                className="group flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-[#0d1527] hover:border-cyan-500/40 cursor-pointer transition-colors text-left"
+                className="group flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-[#0a0f20] hover:border-cyan-500/40 cursor-pointer transition-colors text-left"
               >
                 <div>
                   <h4 className="font-display text-sm font-bold text-white group-hover:text-cyan-300">

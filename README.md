@@ -1,8 +1,10 @@
-# NEON ARCADE — Automatic GitHub Game Discovery
+# AwaisGames — Premium Browser Gaming Platform
 
-NEON ARCADE is a modern, responsive browser gaming portal built with React, Vite, Tailwind CSS, and Phaser 3.
+**Live Website**: [https://awaisgames.netlify.app/](https://awaisgames.netlify.app/)
 
-It features a **Zero-Database, GitOps-Driven Game Discovery Engine**. Adding a new game requires **zero modifications** to the React code, routes, or any manual registry. You simply commit a new folder inside `games/`, push to GitHub, and your hosting provider (such as Netlify) automatically compiles, bundles, and publishes the new game to the live portal.
+AwaisGames is a fast, responsive browser gaming platform inspired by the game-discovery and usability strengths of Poki, CrazyGames, and Coolmath Games, built with React, Vite, Tailwind CSS, and Phaser 3.
+
+It features a **Zero-Database, GitOps-Driven Game Discovery Engine**. Adding a new game requires **zero modifications** to the React code, routes, or manual registries. You simply commit a new folder inside `games/`, push to GitHub, and your hosting provider (Netlify) automatically compiles, bundles, and publishes the new game to the live portal.
 
 ---
 
