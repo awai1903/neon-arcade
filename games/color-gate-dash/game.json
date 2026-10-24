@@ -1,0 +1,19 @@
+{
+  "id": "color-gate-dash",
+  "title": "Color Gate Dash",
+  "description": "One-tap chromatic jumper. Propel your glowing orb upward through revolving neon rings and shifting bar gates, matching color barriers, snatching stars, and defying gravity.",
+  "category": "Arcade",
+  "thumbnail": "./thumbnail.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-24",
+  "tags": ["Color Switch", "Jumper", "Timing", "Arcade", "Neon"],
+  "controls": {
+    "desktop": "Space / Left Click / Up Arrow: Jump Up · P: Pause",
+    "mobile": "Tap anywhere on screen to jump"
+  }
+}

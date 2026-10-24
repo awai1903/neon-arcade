@@ -1,0 +1,19 @@
+{
+  "id": "brick-blitz",
+  "title": "Brick Blitz",
+  "description": "High-octane neon breakout arcade. Smash through fortified brick arrays, grab game-changing power capsules, chain massive combo multipliers, and conquer dynamic level stages.",
+  "category": "Arcade",
+  "thumbnail": "./thumbnail.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-24",
+  "tags": ["Breakout", "Brick Breaker", "Arcade", "Retro"],
+  "controls": {
+    "desktop": "Mouse/Touch or A/D/Arrows: Move Paddle · Space/Click: Launch Ball · P: Pause",
+    "mobile": "Drag: Move Paddle · Tap: Launch Ball"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "tower-stack",
+  "title": "Tower Stack",
+  "description": "Rhythm and timing tower builder. Slice and stack oscillating blocks with precision, chain flawless perfect snaps to expand your foundation, and climb skyward through shifting chromatic skies.",
+  "category": "Puzzle",
+  "thumbnail": "./thumbnail.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-24",
+  "tags": ["Stack", "Tower", "Timing", "Puzzle", "Arcade"],
+  "controls": {
+    "desktop": "Space / Left Click / Enter: Drop Block · P: Pause",
+    "mobile": "Tap anywhere on screen to drop block"
+  }
+}

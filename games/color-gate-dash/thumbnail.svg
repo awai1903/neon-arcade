@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050814"/>
+      <stop offset="100%" stop-color="#0c1126"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg)"/>
+
+  <!-- Rotating 4-color Ring Gate -->
+  <g transform="translate(200, 135)" filter="url(#glow)">
+    <!-- Arc 1: Cyan -->
+    <path d="M 0 -65 A 65 65 0 0 1 65 0" fill="none" stroke="#00e5ff" stroke-width="12" stroke-linecap="round"/>
+    <!-- Arc 2: Magenta -->
+    <path d="M 65 0 A 65 65 0 0 1 0 65" fill="none" stroke="#ff2bd6" stroke-width="12" stroke-linecap="round"/>
+    <!-- Arc 3: Yellow -->
+    <path d="M 0 65 A 65 65 0 0 1 -65 0" fill="none" stroke="#ffd400" stroke-width="12" stroke-linecap="round"/>
+    <!-- Arc 4: Green -->
+    <path d="M -65 0 A 65 65 0 0 1 0 -65" fill="none" stroke="#18ff6d" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <!-- Player Glowing Ball jumping through -->
+  <g transform="translate(200, 195)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="14" fill="#00e5ff"/>
+    <circle cx="-3" cy="-3" r="5" fill="#ffffff"/>
+  </g>
+
+  <!-- Bonus Star inside Ring -->
+  <polygon points="200,123 203,131 212,131 205,136 208,144 200,139 192,144 195,136 188,131 197,131" fill="#ffd400" filter="url(#glow)"/>
+
+  <!-- Title -->
+  <text x="200" y="44" font-family="system-ui, sans-serif" font-size="26" font-weight="900" fill="#00e5ff" text-anchor="middle" filter="url(#glow)" letter-spacing="2">COLOR GATE DASH</text>
+  <text x="200" y="282" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="3">ONE-TAP CHROMATIC JUMPER</text>
+</svg>

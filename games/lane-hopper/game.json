@@ -1,0 +1,19 @@
+{
+  "id": "lane-hopper",
+  "title": "Lane Hopper",
+  "description": "Hop across busy neon highways, rushing rivers, and speeding train tracks. Dodge cars, catch logs, grab coins, and don't linger too long under the shadow of the predator hawk!",
+  "category": "Arcade",
+  "thumbnail": "./thumbnail.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-24",
+  "tags": ["Hopper", "Endless", "Dodge", "Arcade"],
+  "controls": {
+    "desktop": "W/Up/Space: Hop Forward · A/Left: Hop Left · D/Right: Hop Right · S/Down: Hop Back · P: Pause",
+    "mobile": "Tap: Hop Forward · Swipe Left/Right/Down: Hop in direction"
+  }
+}

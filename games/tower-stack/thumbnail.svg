@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg)"/>
+
+  <!-- Tower Blocks -->
+  <g filter="url(#glow)">
+    <!-- Base -->
+    <rect x="120" y="225" width="160" height="24" rx="4" fill="#06b6d4"/>
+    <!-- Stack 1 -->
+    <rect x="125" y="198" width="150" height="24" rx="4" fill="#3b82f6"/>
+    <!-- Stack 2 -->
+    <rect x="130" y="171" width="140" height="24" rx="4" fill="#8b5cf6"/>
+    <!-- Stack 3 -->
+    <rect x="135" y="144" width="130" height="24" rx="4" fill="#ec4899"/>
+    <!-- Stack 4 (sliding top) -->
+    <rect x="145" y="117" width="130" height="24" rx="4" fill="#f43f5e"/>
+  </g>
+
+  <!-- Sliced cutoff chunk falling -->
+  <g transform="translate(285, 135) rotate(24)">
+    <rect x="0" y="0" width="25" height="22" rx="3" fill="#f43f5e" opacity="0.8"/>
+  </g>
+
+  <!-- Stars -->
+  <circle cx="60" cy="70" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="340" cy="85" r="1.5" fill="#ffffff" opacity="0.8"/>
+  <circle cx="80" cy="160" r="2" fill="#38bdf8" opacity="0.6"/>
+  <circle cx="320" cy="200" r="1.5" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Title -->
+  <text x="200" y="45" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#a855f7" text-anchor="middle" filter="url(#glow)" letter-spacing="2">TOWER STACK</text>
+  <text x="200" y="282" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="3">PRECISION TIMING PUZZLE</text>
+</svg>

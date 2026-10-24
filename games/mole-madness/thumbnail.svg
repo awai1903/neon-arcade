@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1518"/>
+      <stop offset="100%" stop-color="#132724"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" fill="url(#bg)"/>
+
+  <!-- Holes -->
+  <ellipse cx="110" cy="190" rx="45" ry="18" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+  <ellipse cx="290" cy="190" rx="45" ry="18" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+  <ellipse cx="200" cy="235" rx="55" ry="22" fill="#0f172a" stroke="#475569" stroke-width="4"/>
+
+  <!-- Mole popping from center hole -->
+  <g transform="translate(200, 195)">
+    <!-- Body -->
+    <path d="M -30 20 Q -30 -35 0 -40 Q 30 -35 30 20 Z" fill="#92400e" stroke="#b45309" stroke-width="2"/>
+    <!-- Snout -->
+    <ellipse cx="0" cy="-12" rx="14" ry="10" fill="#fbcfe8"/>
+    <ellipse cx="0" cy="-16" rx="5" ry="3.5" fill="#471424"/>
+    <!-- Eyes with funny dizzy look -->
+    <circle cx="-10" cy="-25" r="4.5" fill="#ffffff"/>
+    <circle cx="10" cy="-25" r="4.5" fill="#ffffff"/>
+    <circle cx="-9" cy="-25" r="2" fill="#0f172a"/>
+    <circle cx="11" cy="-25" r="2" fill="#0f172a"/>
+    <!-- Cheeks -->
+    <circle cx="-16" cy="-14" r="3" fill="#f472b6" opacity="0.6"/>
+    <circle cx="16" cy="-14" r="3" fill="#f472b6" opacity="0.6"/>
+  </g>
+
+  <!-- Hammer swinging in -->
+  <g transform="translate(260, 130) rotate(-35)" filter="url(#glow)">
+    <!-- Handle -->
+    <rect x="-6" y="0" width="12" height="70" rx="4" fill="#d97706" stroke="#78350f" stroke-width="2"/>
+    <!-- Head -->
+    <rect x="-24" y="-20" width="48" height="28" rx="6" fill="#00d4ff" stroke="#38bdf8" stroke-width="2"/>
+  </g>
+
+  <!-- Stars -->
+  <polygon points="120,120 123,127 131,127 125,132 127,140 120,135 113,140 115,132 109,127 117,127" fill="#fbbf24" filter="url(#glow)"/>
+  <polygon points="280,100 282,105 288,105 283,109 285,115 280,111 275,115 277,109 272,105 278,105" fill="#38bdf8" filter="url(#glow)"/>
+
+  <!-- Title -->
+  <text x="200" y="45" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#f59e0b" text-anchor="middle" filter="url(#glow)" letter-spacing="2">MOLE MADNESS</text>
+  <text x="200" y="282" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" text-anchor="middle" letter-spacing="3">60-SECOND ARCADE WHACKER</text>
+</svg>

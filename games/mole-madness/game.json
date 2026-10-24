@@ -1,0 +1,19 @@
+{
+  "id": "mole-madness",
+  "title": "Mole Madness",
+  "description": "Fast-reflex arcade whacker with a 60-second countdown. Whack golden moles for time bonuses, trigger freeze storms, dodge volatile TNT bombs, and rack up x5 combo multipliers!",
+  "category": "Casual",
+  "thumbnail": "./thumbnail.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": false,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-24",
+  "tags": ["Whack-a-Mole", "Casual", "Reflex", "Arcade"],
+  "controls": {
+    "desktop": "Click holes or use Keys: Q W E / A S D / Z X C / 1 2 3 · P: Pause",
+    "mobile": "Tap holes to whack critters"
+  }
+}

@@ -1,0 +1,10 @@
+.tower-stack-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #090e1c;
+  outline: none;
+  touch-action: none;
+  border-radius: 8px;
+}
