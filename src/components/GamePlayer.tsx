@@ -24,7 +24,6 @@ interface GamePlayerProps {
   allGames: DiscoveredGame[];
   onBack: () => void;
   onPlayGame: (id: string) => void;
-  onOpenDocs: () => void;
 }
 
 export const GamePlayer: React.FC<GamePlayerProps> = ({
@@ -32,12 +31,13 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   allGames,
   onBack,
   onPlayGame,
-  onOpenDocs,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameInstanceRef = useRef<GameObject | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(15);
+  const [loadingStatus, setLoadingStatus] = useState('Initializing game viewport...');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -87,13 +87,39 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   // 3. Game module loading, execution, and cleanup
   useEffect(() => {
     let isSubscribed = true;
+    let progressInterval: any = null;
+
     setIsLoading(true);
+    setLoadProgress(15);
+    setLoadingStatus('Initializing game viewport...');
     setLoadError(null);
     setCurrentScore(0);
     setIsPaused(false);
 
+    // Smooth progressive status updates while scripts and assets compile
+    progressInterval = setInterval(() => {
+      setLoadProgress((prev) => {
+        if (prev < 45) {
+          setLoadingStatus('Loading sprites and shaders...');
+          return prev + 12;
+        } else if (prev < 75) {
+          setLoadingStatus('Configuring audio channels & controls...');
+          return prev + 8;
+        } else if (prev < 92) {
+          setLoadingStatus('Launching 60 FPS renderer...');
+          return prev + 3;
+        }
+        return prev;
+      });
+    }, 110);
+
     const initGame = async () => {
       try {
+        if (game.entryType === 'html') {
+          // Handled via iframe onLoad
+          return;
+        }
+
         const container = containerRef.current;
         if (!container) return;
 
@@ -152,8 +178,19 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         }
 
         gameInstanceRef.current = result;
-        setIsLoading(false);
+        
+        // Complete progress
+        if (progressInterval) clearInterval(progressInterval);
+        setLoadProgress(100);
+        setLoadingStatus('Ready!');
+
+        setTimeout(() => {
+          if (isSubscribed) {
+            setIsLoading(false);
+          }
+        }, 160);
       } catch (err: any) {
+        if (progressInterval) clearInterval(progressInterval);
         console.error('Failed to load game:', err);
         if (isSubscribed) {
           setLoadError(err.message || 'Unknown error occurred while bootstrapping game.');
@@ -166,6 +203,7 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
 
     return () => {
       isSubscribed = false;
+      if (progressInterval) clearInterval(progressInterval);
       if (gameInstanceRef.current) {
         try {
           if (typeof gameInstanceRef.current.destroy === 'function') {
@@ -213,6 +251,15 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   };
 
   const handleRestart = () => {
+    if (game.entryType === 'html') {
+      const iframe = document.querySelector('#game-stage iframe') as HTMLIFrameElement | null;
+      if (iframe) {
+        // Reload iframe to cleanly return to game start screen
+        const currentSrc = iframe.src;
+        iframe.src = '';
+        iframe.src = currentSrc;
+      }
+    }
     const instance = gameInstanceRef.current;
     if (instance && typeof instance.restart === 'function') {
       instance.restart();
@@ -236,8 +283,6 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
-
-  const otherGames = allGames.filter((g) => g.id !== game.id);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
@@ -313,11 +358,12 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
 
           <button
             onClick={handleRestart}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-800 bg-[#0a0f20] text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40"
-            title="Restart Game"
-            aria-label="Restart Game"
+            className="flex h-9 items-center gap-1.5 rounded-lg border border-slate-800 bg-[#0a0f20] px-2.5 text-xs font-semibold text-slate-300 hover:text-cyan-400 hover:border-cyan-500/40 active:scale-95 transition-colors"
+            title="Restart game and return to start screen"
+            aria-label="Restart game and return to start screen"
           >
             <RotateCcw className="h-4 w-4" />
+            <span className="hidden sm:inline">Restart</span>
           </button>
 
           <button
@@ -356,16 +402,57 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           isFullscreen ? 'fixed inset-0 z-50 rounded-none border-none' : 'w-full'
         }`}
       >
-        {/* Loading Spinner */}
+        {/* Loading Spinner & Visual Progress Bar */}
         {isLoading && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#060913]/95 backdrop-blur-sm">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent mb-3" />
-            <p className="font-display text-sm font-bold text-white">
-              Starting {game.manifest.title}...
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#060913]/95 backdrop-blur-md p-6 text-center select-none">
+            {/* Ambient Background Art */}
+            {game.thumbnailUrl && (
+              <div className="absolute inset-0 -z-10 overflow-hidden opacity-20">
+                <img
+                  src={game.thumbnailUrl}
+                  alt=""
+                  className="h-full w-full object-cover blur-xl scale-110"
+                />
+              </div>
+            )}
+
+            {/* Glowing Dual-Ring Neon Spinner */}
+            <div className="relative mb-5 flex items-center justify-center">
+              {/* Outer Cyan Ring */}
+              <div className="h-14 w-14 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent shadow-lg shadow-cyan-500/30" />
+              {/* Inner Violet Ring */}
+              <div className="absolute h-9 w-9 animate-spin rounded-full border-2 border-violet-400 border-b-transparent [animation-direction:reverse] [animation-duration:1.1s]" />
+              {/* Center Game Icon */}
+              <div className="absolute flex h-5 w-5 items-center justify-center text-cyan-300">
+                <Gamepad2 className="h-4 w-4" />
+              </div>
+            </div>
+
+            {/* Game Title & Stage Status */}
+            <h2 className="font-display text-base sm:text-lg font-bold text-white tracking-tight">
+              Loading {game.manifest.title}
+            </h2>
+            <p className="text-xs text-slate-300 mt-1 max-w-xs transition-all duration-200">
+              {loadingStatus}
             </p>
-            <p className="text-xs text-slate-400 mt-1">
-              Loading module from <code className="text-cyan-300">games/{game.folderName}/</code>
-            </p>
+
+            {/* Visual Neon Progress Bar */}
+            <div className="mt-4 w-64 max-w-[80vw]">
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1.5">
+                <span className="text-slate-400 text-[10px] uppercase font-semibold">Status</span>
+                <span className="font-bold text-cyan-300 tabular-nums">{Math.round(loadProgress)}%</span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-900 border border-slate-800 p-0.5 shadow-inner">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-cyan-300 to-violet-500 shadow-sm shadow-cyan-500/50 transition-all duration-200 ease-out"
+                  style={{ width: `${Math.min(100, Math.max(8, loadProgress))}%` }}
+                />
+              </div>
+            </div>
+
+            <span className="text-[10px] text-slate-400 mt-3 font-mono">
+              Direct Browser Engine · Smooth 60 FPS
+            </span>
           </div>
         )}
 
@@ -387,122 +474,107 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
                 Back to All Games
               </button>
               <button
-                onClick={onOpenDocs}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-400"
+                onClick={() => window.location.reload()}
+                className="rounded-lg bg-cyan-400 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-300"
               >
-                Inspect Game Contract
+                Reload Game
               </button>
             </div>
           </div>
         )}
 
-        {/* Game Canvas Mount Point (Strict container isolation) */}
-        <div
-          ref={containerRef}
-          id={`game-mount-${game.id}`}
-          className={`game-container-${game.folderName} relative flex items-center justify-center mx-auto`}
-          style={{
-            width: '100%',
-            height: isFullscreen ? '100vh' : 'auto',
-            aspectRatio: isFullscreen ? undefined : '16/10',
-            maxHeight: isFullscreen ? undefined : '600px',
-            minHeight: isFullscreen ? undefined : '360px',
-          }}
-        />
+        {/* Game Execution Mount: Either HTML sandbox iframe or Canvas container */}
+        {game.entryType === 'html' && game.htmlUrl ? (
+          <iframe
+            src={game.htmlUrl}
+            title={game.manifest.title}
+            className="w-full h-full border-0 bg-slate-950"
+            allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"
+            onLoad={() => {
+              setLoadProgress(100);
+              setLoadingStatus('Ready!');
+              setTimeout(() => setIsLoading(false), 150);
+            }}
+            style={{
+              width: '100%',
+              height: isFullscreen ? '100vh' : 'auto',
+              aspectRatio: isFullscreen ? undefined : '16/10',
+              maxHeight: isFullscreen ? undefined : '640px',
+              minHeight: isFullscreen ? undefined : '380px',
+            }}
+          />
+        ) : (
+          <div
+            ref={containerRef}
+            id={`game-mount-${game.id}`}
+            className={`game-container-${game.folderName} relative flex items-center justify-center mx-auto`}
+            style={{
+              width: '100%',
+              height: isFullscreen ? '100vh' : 'auto',
+              aspectRatio: isFullscreen ? undefined : '16/10',
+              maxHeight: isFullscreen ? undefined : '600px',
+              minHeight: isFullscreen ? undefined : '360px',
+            }}
+          />
+        )}
       </div>
 
-      {/* Game Details & Instructions Grid */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: How to Play & Controls (8 cols) */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="rounded-xl border border-slate-800 bg-[#0a0f20] p-4">
-            <h2 className="font-display text-base font-bold text-white mb-3 flex items-center gap-2">
+      {/* Game Details & Instructions (Isolated for this specific game) */}
+      <div className="mt-6 max-w-4xl mx-auto">
+        <div className="rounded-2xl border border-slate-800 bg-[#0a0f20] p-5 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
+            <h2 className="font-display text-base font-bold text-white flex items-center gap-2">
               <Gamepad2 className="h-4 w-4 text-cyan-400" />
               <span>How to Play & Controls</span>
             </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="rounded-lg bg-[#0e152d] p-3 border border-slate-800/80">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 block mb-1">
-                  Desktop Keyboard
-                </span>
-                <p className="text-slate-200 font-medium leading-relaxed">
-                  {game.manifest.controls?.desktop || 'Arrow Keys / Space to Play · P to Pause'}
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-[#0e152d] p-3 border border-slate-800/80">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-violet-400 block mb-1">
-                  Mobile Touch
-                </span>
-                <p className="text-slate-200 font-medium leading-relaxed">
-                  {game.manifest.controls?.mobile || 'Tap on the screen to interact and play'}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-300 leading-relaxed">
-              {game.logoUrl && (
-                <div className="mb-3 max-w-[280px]">
-                  <img
-                    src={game.logoUrl}
-                    alt={`${game.manifest.title} Logo`}
-                    className="h-12 w-auto object-contain"
-                  />
-                </div>
-              )}
-              <span className="font-semibold text-white block mb-1">About {game.manifest.title}:</span>
-              <p>{game.manifest.description}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: More Games to Play (4 cols) */}
-        <div className="lg:col-span-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-sm font-bold text-white">More Games to Play</h3>
-            <button
-              onClick={onBack}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium"
-            >
-              View all
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-2.5">
-            {otherGames.map((other) => (
-              <div
-                key={other.id}
-                onClick={() => onPlayGame(other.id)}
-                className="group flex items-center gap-3 rounded-xl border border-slate-800 bg-[#0a0f20] p-2 hover:border-cyan-500/40 hover:bg-[#0e152d] transition-all cursor-pointer"
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRestart}
+                className="flex items-center gap-1.5 rounded-lg border border-slate-700/80 bg-slate-800/80 hover:bg-slate-700 px-3 py-1 text-xs font-semibold text-cyan-300 hover:text-white transition-all active:scale-95"
+                title="Restart game and return to start screen"
               >
-                <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-900">
-                  {other.thumbnailUrl ? (
-                    <img
-                      src={other.thumbnailUrl}
-                      alt={other.manifest.title}
-                      referrerPolicy="no-referrer"
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-slate-800" />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <span className="text-[10px] font-semibold text-cyan-400 block truncate">
-                    {other.category}
-                  </span>
-                  <h4 className="font-display text-xs font-bold text-white group-hover:text-cyan-300 truncate">
-                    {other.manifest.title}
-                  </h4>
-                </div>
-
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors shrink-0">
-                  <Play className="h-3 w-3 fill-current ml-0.5" />
-                </div>
+                <RotateCcw className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Restart to Start Screen</span>
+              </button>
+              <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-mono">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span>60 FPS</span>
               </div>
-            ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mb-5">
+            <div className="rounded-xl bg-[#0e152d] p-3.5 border border-slate-800/80">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 block mb-1">
+                Desktop Keyboard
+              </span>
+              <p className="text-slate-200 font-medium leading-relaxed">
+                {game.manifest.controls?.desktop || 'Arrow Keys / Space to Play · P to Pause'}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#0e152d] p-3.5 border border-slate-800/80">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-violet-400 block mb-1">
+                Mobile Touch
+              </span>
+              <p className="text-slate-200 font-medium leading-relaxed">
+                {game.manifest.controls?.mobile || 'Tap on the screen to interact and play'}
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800/80 pt-4 text-xs text-slate-300 leading-relaxed">
+            {game.logoUrl && (
+              <div className="mb-3 max-w-[240px]">
+                <img
+                  src={game.logoUrl}
+                  alt={`${game.manifest.title} Logo`}
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
+            )}
+            <span className="font-semibold text-white block mb-1">About {game.manifest.title}:</span>
+            <p className="text-slate-300 leading-relaxed max-w-3xl">{game.manifest.description}</p>
           </div>
         </div>
       </div>

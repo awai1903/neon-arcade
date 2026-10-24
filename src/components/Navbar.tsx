@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Gamepad2, Search, Dices, Trophy, FolderGit2, X, Sparkles } from 'lucide-react';
+import { Gamepad2, Search, Dices, Trophy, X } from 'lucide-react';
 import type { DiscoveredGame } from '../types/game';
+import { getGamePlayUrl } from '../core/router';
+import { triggerHaptic } from '../utils/haptics';
 
 interface NavbarProps {
   onNavigateHome: () => void;
   onSelectGame: (id: string) => void;
-  onOpenDocs: () => void;
   onOpenHighScores: () => void;
   games: DiscoveredGame[];
   searchQuery: string;
@@ -18,7 +19,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onNavigateHome,
   onSelectGame,
-  onOpenDocs,
   onOpenHighScores,
   games,
   searchQuery,
@@ -45,8 +45,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleRandomGame = () => {
     if (games.length === 0) return;
+    triggerHaptic('medium');
     const randomIndex = Math.floor(Math.random() * games.length);
-    onSelectGame(games[randomIndex].id);
+    const targetGame = games[randomIndex];
+    onSelectGame(targetGame.id);
+    window.open(getGamePlayUrl(targetGame.id), '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -142,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden sm:inline">Surprise Me</span>
           </button>
 
-          {/* High Scores */}
+          {/* High Scores / Records */}
           <button
             onClick={onOpenHighScores}
             className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#0a0f20] px-3 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:border-cyan-500/50 hover:bg-cyan-950/30 hover:text-cyan-300 active:scale-95"
@@ -151,17 +154,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Trophy className="h-4 w-4 text-yellow-400" />
             <span className="hidden sm:inline">Records</span>
-          </button>
-
-          {/* GitHub Discovery Spec */}
-          <button
-            onClick={onOpenDocs}
-            className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-violet-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-sm shadow-cyan-500/20 transition-all hover:brightness-110 active:scale-95"
-            aria-label="GitHub Game Publishing Guide"
-          >
-            <FolderGit2 className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">Add Game via Git</span>
-            <span className="md:hidden">Add</span>
           </button>
         </div>
       </div>

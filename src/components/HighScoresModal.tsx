@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { DiscoveredGame } from '../types/game';
-import { X, Trophy, Medal, RotateCcw, Play } from 'lucide-react';
+import { getGamePlayUrl } from '../core/router';
+import { X, Trophy, Medal, RotateCcw, Play, ExternalLink } from 'lucide-react';
 
 interface HighScoresModalProps {
   isOpen: boolean;
@@ -45,12 +46,13 @@ export const HighScoresModal: React.FC<HighScoresModalProps> = ({
             </div>
             <div>
               <h2 className="font-display text-lg font-bold text-white">Arcade Records</h2>
-              <p className="text-xs text-slate-400">All-time local high scores across discovered games</p>
+              <p className="text-xs text-slate-400">Personal best scores saved on this device</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+            aria-label="Close high scores"
           >
             <X className="h-5 w-5" />
           </button>
@@ -94,16 +96,22 @@ export const HighScoresModal: React.FC<HighScoresModalProps> = ({
                     </button>
                   )}
 
-                  <button
+                  <a
+                    href={getGamePlayUrl(g.id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={() => {
                       onClose();
                       onPlayGame(g.id);
                     }}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 active:scale-95"
-                    title="Play"
+                    className="flex h-8 items-center gap-1.5 rounded-lg bg-cyan-500/10 px-2.5 text-xs font-semibold text-cyan-400 hover:bg-cyan-500/20 active:scale-95 transition-all"
+                    title={`Play ${g.manifest.title} in new tab`}
+                    aria-label={`Play ${g.manifest.title} in new tab`}
                   >
-                    <Play className="h-4 w-4 fill-current" />
-                  </button>
+                    <Play className="h-3.5 w-3.5 fill-current" />
+                    <span>Play</span>
+                    <ExternalLink className="h-3 w-3 text-cyan-400/70" />
+                  </a>
                 </div>
               </div>
             );

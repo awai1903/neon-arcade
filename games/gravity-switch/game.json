@@ -1,0 +1,19 @@
+{
+  "id": "gravity-switch",
+  "title": "Neon Rush: Gravity Switch",
+  "description": "High-velocity cyber runner. Tap or press Space to invert gravity between floor and ceiling, dodge high-voltage laser barriers, collect quantum pulse shards, and survive exponential velocity overdrive.",
+  "category": "Action",
+  "thumbnail": "./assets/branding/gravity-switch-icon.svg",
+  "entry": "game.js",
+  "style": "game.css",
+  "engine": "canvas",
+  "version": "1.0.0",
+  "featured": true,
+  "author": "AwaisGames Studio",
+  "releaseDate": "2026-10-23",
+  "tags": ["Gravity Switch", "Endless Runner", "Cyberpunk", "One Touch", "Fast Pace", "Action"],
+  "controls": {
+    "desktop": "Spacebar or Left Click to switch gravity between floor & ceiling · P to Pause",
+    "mobile": "Tap anywhere on screen to invert gravity"
+  }
+}

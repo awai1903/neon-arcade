@@ -9,8 +9,9 @@ export interface GameManifest {
   category: string;
   thumbnail: string;
   entry: string;
+  icon?: string;
   style?: string;
-  engine?: 'phaser' | 'canvas' | 'custom' | string;
+  engine?: 'phaser' | 'canvas' | 'threejs' | 'html' | 'custom' | string;
   version?: string;
   featured?: boolean;
   author?: string;
@@ -29,6 +30,8 @@ export interface DiscoveredGame {
   manifest: GameManifest;
   thumbnailUrl: string;
   hasValidThumbnail: boolean;
+  entryType: 'module' | 'html';
+  htmlUrl?: string;
   rawCss?: string;
   assets: Record<string, string>; // Maps relative path (e.g., 'assets/player.png') to bundled URL
   getAssetUrl: (relativePath: string) => string;

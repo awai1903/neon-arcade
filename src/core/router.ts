@@ -9,6 +9,7 @@ export interface RouteState {
 
 /**
  * Extracts game ID from current URL (path, hash, or query)
+ * Supports /play/:id/, /games/:id/, /game/:id/
  */
 export function getCurrentRoute(): RouteState {
   if (typeof window === 'undefined') return { view: 'home' };
@@ -16,26 +17,26 @@ export function getCurrentRoute(): RouteState {
   const pathname = window.location.pathname.replace(/\/+$/, '');
   const hash = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
   const searchParams = new URLSearchParams(window.location.search);
-  const queryGame = searchParams.get('game');
+  const queryGame = searchParams.get('game') || searchParams.get('play');
   const queryCategory = searchParams.get('category');
 
   let targetId: string | null = null;
 
-  // 1. Path-based route: /games/cyber-invaders or /game/cyber-invaders
-  const pathMatch = pathname.match(/^\/(?:games|game)\/([^/]+)$/i);
+  // 1. Path-based route: /play/cyber-invaders or /games/cyber-invaders
+  const pathMatch = pathname.match(/^\/(?:play|games|game)\/([^/]+)$/i);
   if (pathMatch) {
     targetId = pathMatch[1].trim();
   }
 
-  // 2. Hash-based fallback: #game/cyber-invaders or #/games/cyber-invaders
+  // 2. Hash-based fallback: #play/cyber-invaders or #/play/cyber-invaders
   if (!targetId && hash) {
-    const hashMatch = hash.match(/^(?:games|game)\/([^/]+)$/i);
+    const hashMatch = hash.match(/^(?:play|games|game)\/([^/]+)$/i);
     if (hashMatch) {
       targetId = hashMatch[1].trim();
     }
   }
 
-  // 3. Query-based fallback: ?game=cyber-invaders
+  // 3. Query-based fallback: ?play=cyber-invaders or ?game=cyber-invaders
   if (!targetId && queryGame) {
     targetId = queryGame.trim();
   }
@@ -52,6 +53,13 @@ export function getCurrentRoute(): RouteState {
     view: 'home',
     category: queryCategory || undefined,
   };
+}
+
+/**
+ * Returns canonical dedicated URL for a game
+ */
+export function getGamePlayUrl(id: string): string {
+  return `/play/${id}/`;
 }
 
 /**
@@ -89,7 +97,7 @@ export function updateSEO(game?: DiscoveredGame) {
     const { manifest } = game;
     const title = `${manifest.title} — Play Free Online on ${siteName}`;
     const desc = `Play ${manifest.title} free in your browser on ${siteName}. ${manifest.description} No downloads, instant gameplay!`;
-    const gameUrl = `${baseUrl}/games/${game.id}`;
+    const gameUrl = `${baseUrl}/play/${game.id}/`;
 
     document.title = title;
     setMeta('description', desc);

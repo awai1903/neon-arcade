@@ -77,7 +77,7 @@ export const LegalModals: React.FC<LegalModalsProps> = ({ modalType, onClose }) 
                 </ul>
               </div>
               <p className="text-slate-400">
-                The game library is maintained through GitHub with automated build-time discovery. New games are added via repository folders without manual database registration.
+                All games are optimized for fast loading and responsive 60 FPS performance across desktop, tablet, and mobile browsers. Enjoy arcade entertainment with zero waiting.
               </p>
             </div>
           )}

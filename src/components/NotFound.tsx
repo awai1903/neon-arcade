@@ -1,25 +1,23 @@
 import React from 'react';
 import type { DiscoveredGame } from '../types/game';
-import { Ghost, Home, FolderGit2, Play } from 'lucide-react';
+import { getGamePlayUrl } from '../core/router';
+import { Ghost, Home, Play, ExternalLink } from 'lucide-react';
 
 interface NotFoundProps {
   attemptedId: string;
   games: DiscoveredGame[];
   onNavigateHome: () => void;
   onPlayGame: (id: string) => void;
-  onOpenDocs: () => void;
 }
 
 export const NotFound: React.FC<NotFoundProps> = ({
-  attemptedId,
   games,
   onNavigateHome,
   onPlayGame,
-  onOpenDocs,
 }) => {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-pink-500/10 text-pink-400 ring-1 ring-pink-500/30 mx-auto mb-4">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 ring-1 ring-cyan-500/30 mx-auto mb-4">
         <Ghost className="h-8 w-8" />
       </div>
 
@@ -27,55 +25,47 @@ export const NotFound: React.FC<NotFoundProps> = ({
         Game Not Found
       </h1>
 
-      <p className="mt-2 text-sm text-slate-400">
-        No discovered manifest matched route <code className="text-cyan-300 font-mono">games/{attemptedId}/game.json</code>.
+      <p className="mt-2 text-sm text-slate-400 max-w-md mx-auto">
+        The game you are looking for doesn't exist or may have been moved.
       </p>
 
-      <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
-        If you just created this game folder in GitHub, ensure it was committed and that Netlify finished running <code className="text-slate-400 font-mono">npm run build</code>.
-      </p>
-
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
+      <div className="mt-6 flex justify-center">
         <button
           onClick={onNavigateHome}
-          className="flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-2.5 font-display text-xs font-bold text-slate-950 hover:bg-cyan-300 active:scale-95"
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-300 px-6 py-2.5 font-display text-xs font-extrabold text-slate-950 shadow-md shadow-cyan-500/25 hover:brightness-110 active:scale-95 transition-all"
         >
           <Home className="h-4 w-4" />
-          <span>Back to Homepage</span>
-        </button>
-
-        <button
-          onClick={onOpenDocs}
-          className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#0a0f20] px-5 py-2.5 text-xs font-medium text-slate-300 hover:text-white active:scale-95"
-        >
-          <FolderGit2 className="h-4 w-4 text-violet-400" />
-          <span>CI/CD Spec</span>
+          <span>Back to All Games</span>
         </button>
       </div>
 
       {/* Suggested Games */}
       {games.length > 0 && (
         <div className="mt-12 border-t border-slate-800/80 pt-8">
-          <h3 className="font-display text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
-            Available Games in this Build
-          </h3>
+          <h2 className="font-display text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
+            Popular Games to Play
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-            {games.map((g) => (
-              <div
+            {games.slice(0, 4).map((g) => (
+              <a
                 key={g.id}
+                href={getGamePlayUrl(g.id)}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => onPlayGame(g.id)}
-                className="group flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-[#0a0f20] hover:border-cyan-500/40 cursor-pointer transition-colors text-left"
+                className="group flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-[#0a0f20] hover:border-cyan-500/40 hover:bg-[#0e152d] cursor-pointer transition-colors text-left"
+                aria-label={`Play ${g.manifest.title} in new tab`}
               >
-                <div>
-                  <h4 className="font-display text-sm font-bold text-white group-hover:text-cyan-300">
+                <div className="min-w-0 pr-2">
+                  <h3 className="font-display text-sm font-bold text-white group-hover:text-cyan-300 truncate">
                     {g.manifest.title}
-                  </h4>
-                  <span className="text-[11px] text-slate-500">{g.category}</span>
+                  </h3>
+                  <span className="text-[11px] text-slate-400">{g.category}</span>
                 </div>
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
-                  <Play className="h-3.5 w-3.5 fill-current" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors shrink-0">
+                  <Play className="h-3.5 w-3.5 fill-current ml-0.5" />
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

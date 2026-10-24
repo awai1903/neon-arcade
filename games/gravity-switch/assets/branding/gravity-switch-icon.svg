@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050814"/>
+      <stop offset="50%" stop-color="#0a1228"/>
+      <stop offset="100%" stop-color="#070c1d"/>
+    </linearGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="neonPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#be185d"/>
+    </linearGradient>
+    <linearGradient id="neonViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)" stroke="#1a2342" stroke-width="4"/>
+
+  <!-- Speed Lines & Grid -->
+  <line x1="64" y1="96" x2="448" y2="96" stroke="#00d4ff" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  <line x1="64" y1="416" x2="448" y2="416" stroke="#a855f7" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+
+  <path d="M120 96 L120 416 M200 96 L200 416 M280 96 L280 416 M360 96 L360 416" stroke="#00d4ff" stroke-opacity="0.08" stroke-width="2"/>
+
+  <!-- Gravity Switch Inversion Arrows -->
+  <path d="M210 200 L256 140 L302 200" fill="none" stroke="#00d4ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M210 312 L256 372 L302 312" fill="none" stroke="#ec4899" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+
+  <!-- Player Energy Core Cube -->
+  <rect x="206" y="206" width="100" height="100" rx="20" fill="url(#neonCyan)" filter="url(#glow)"/>
+  <rect x="231" y="231" width="50" height="50" rx="10" fill="#ffffff" opacity="0.95"/>
+
+  <!-- Energy Trails -->
+  <rect x="140" y="226" width="40" height="60" rx="12" fill="#00d4ff" opacity="0.4" />
+  <rect x="80" y="238" width="36" height="36" rx="8" fill="#00d4ff" opacity="0.15" />
+</svg>

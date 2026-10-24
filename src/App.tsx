@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { gameCatalogue, getAllCategories, getGameById } from './core/discovery';
-import { getCurrentRoute, navigateTo, updateSEO } from './core/router';
+import { getCurrentRoute, getGamePlayUrl, navigateTo, updateSEO } from './core/router';
 import type { DiscoveredGame } from './types/game';
 import { Navbar } from './components/Navbar';
-import { HeroBanner } from './components/HeroBanner';
 import { RecentlyPlayed, type RecentGameItem } from './components/RecentlyPlayed';
 import { GameGrid } from './components/GameGrid';
 import { GamePlayer } from './components/GamePlayer';
-import { GitHubWorkflowModal } from './components/GitHubWorkflowModal';
 import { GameDetailsModal } from './components/GameDetailsModal';
 import { HighScoresModal } from './components/HighScoresModal';
 import { LegalModals } from './components/LegalModals';
@@ -30,7 +28,6 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState('All');
 
   // Modals state
-  const [isDocsOpen, setIsDocsOpen] = useState(false);
   const [isHighScoresOpen, setIsHighScoresOpen] = useState(false);
   const [inspectedGame, setInspectedGame] = useState<DiscoveredGame | null>(null);
   const [legalModalType, setLegalModalType] = useState<'about' | 'privacy' | 'contact' | null>(null);
@@ -130,11 +127,11 @@ export default function App() {
       setActiveGameId(game.id);
       setCurrentRoute('game');
       recordRecentPlay(game.id);
-      navigateTo(`/games/${game.id}`, game);
+      navigateTo(getGamePlayUrl(game.id), game);
     } else {
       setActiveGameId(id);
       setCurrentRoute('not-found');
-      navigateTo(`/games/${id}`, undefined);
+      navigateTo(`/play/${id}/`, undefined);
     }
   };
 
@@ -143,14 +140,6 @@ export default function App() {
     setCurrentRoute('home');
     navigateTo('/', undefined);
   };
-
-  const featuredGame = useMemo(() => {
-    return games.find((g) => g.isFeatured) || games[0];
-  }, [games]);
-
-  const topGames = useMemo(() => {
-    return games.filter((g) => g.id !== featuredGame?.id);
-  }, [games, featuredGame]);
 
   const activeGame = useMemo(() => {
     return activeGameId ? getGameById(activeGameId) : undefined;
@@ -162,7 +151,6 @@ export default function App() {
       <Navbar
         onNavigateHome={navigateHome}
         onSelectGame={navigateToGame}
-        onOpenDocs={() => setIsDocsOpen(true)}
         onOpenHighScores={() => setIsHighScoresOpen(true)}
         games={games}
         searchQuery={searchQuery}
@@ -176,18 +164,8 @@ export default function App() {
       <main className="flex-1">
         {currentRoute === 'home' && (
           <>
-            {/* Compact Poki/CrazyGames-style Action Hero */}
-            {!searchQuery && (
-              <HeroBanner
-                featuredGame={featuredGame}
-                topGames={topGames}
-                onPlayGame={navigateToGame}
-                onShowInfo={(game) => setInspectedGame(game)}
-              />
-            )}
-
-            {/* Persistent Recently Played Strip (Last 3 games) */}
-            {!searchQuery && (
+            {/* Persistent Recently Played Strip (Last 3 games) if played */}
+            {!searchQuery && recentGamesList.length > 0 && (
               <RecentlyPlayed
                 recentGames={recentGamesList}
                 onPlayGame={navigateToGame}
@@ -196,7 +174,7 @@ export default function App() {
               />
             )}
 
-            {/* Primary Game Catalogue Grid */}
+            {/* Prominent Poki-style Icon-First Game Grid */}
             <GameGrid
               games={games}
               categories={categories}
@@ -206,7 +184,6 @@ export default function App() {
               onSearchChange={setSearchQuery}
               onPlayGame={navigateToGame}
               onShowInfo={(game) => setInspectedGame(game)}
-              onOpenDocs={() => setIsDocsOpen(true)}
             />
           </>
         )}
@@ -217,7 +194,6 @@ export default function App() {
             allGames={games}
             onBack={navigateHome}
             onPlayGame={navigateToGame}
-            onOpenDocs={() => setIsDocsOpen(true)}
           />
         )}
 
@@ -227,24 +203,17 @@ export default function App() {
             games={games}
             onNavigateHome={navigateHome}
             onPlayGame={navigateToGame}
-            onOpenDocs={() => setIsDocsOpen(true)}
           />
         )}
       </main>
 
       {/* Footer */}
       <Footer
-        onOpenDocs={() => setIsDocsOpen(true)}
         onOpenAbout={() => setLegalModalType('about')}
         onOpenPrivacy={() => setLegalModalType('privacy')}
         onOpenContact={() => setLegalModalType('contact')}
+        onOpenHighScores={() => setIsHighScoresOpen(true)}
         gameCount={games.length}
-      />
-
-      {/* GitHub GitOps Spec Modal */}
-      <GitHubWorkflowModal
-        isOpen={isDocsOpen}
-        onClose={() => setIsDocsOpen(false)}
       />
 
       {/* Game Details Inspector Modal */}

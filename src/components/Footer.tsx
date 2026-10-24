@@ -1,19 +1,19 @@
 import React from 'react';
-import { Gamepad2, GitBranch, Terminal, Shield, FileText, Mail, Heart } from 'lucide-react';
+import { Gamepad2, Shield, FileText, Mail, Trophy, Info } from 'lucide-react';
 
 interface FooterProps {
-  onOpenDocs: () => void;
   onOpenAbout: () => void;
   onOpenPrivacy: () => void;
   onOpenContact: () => void;
+  onOpenHighScores?: () => void;
   gameCount: number;
 }
 
 export const Footer: React.FC<FooterProps> = ({
-  onOpenDocs,
   onOpenAbout,
   onOpenPrivacy,
   onOpenContact,
+  onOpenHighScores,
   gameCount,
 }) => {
   return (
@@ -23,21 +23,21 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 text-slate-950 font-bold">
-                <Gamepad2 className="h-4 w-4 fill-slate-950" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 text-slate-950 font-bold shadow-md shadow-cyan-500/20">
+                <Gamepad2 className="h-4 w-4 fill-slate-950 text-slate-950" />
               </div>
               <span className="font-display text-base font-extrabold tracking-tight text-white">
                 Awais<span className="text-cyan-400">Games</span>
               </span>
             </div>
             <p className="max-w-sm text-xs text-slate-400 leading-relaxed">
-              High-performance, instant browser gaming portal. Free web games crafted with modern HTML5 and Phaser 3 engines. No downloads, no installs.
+              Curated, high-performance browser gaming platform. Enjoy action, arcade shmups, 3D speedrunners, and puzzle challenges directly in your browser.
             </p>
-            <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400" />
-              <span>Netlify Continuous Deployment Active</span>
+            <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Instant Play · No Downloads Required</span>
               <span>·</span>
-              <span className="font-mono">{gameCount} Games Loaded</span>
+              <span className="font-mono text-slate-300">{gameCount} Games Available</span>
             </div>
           </div>
 
@@ -48,19 +48,22 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-1.5 text-slate-400">
               <li>
-                <button onClick={onOpenAbout} className="hover:text-cyan-400 transition-colors">
-                  About AwaisGames
+                <button onClick={onOpenAbout} className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                  <Info className="h-3 w-3 text-cyan-400" />
+                  <span>About AwaisGames</span>
                 </button>
               </li>
-              <li>
-                <button onClick={onOpenDocs} className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
-                  <Terminal className="h-3 w-3 text-cyan-400" />
-                  <span>GitHub Discovery Spec</span>
-                </button>
-              </li>
+              {onOpenHighScores && (
+                <li>
+                  <button onClick={onOpenHighScores} className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                    <Trophy className="h-3 w-3 text-yellow-400" />
+                    <span>Personal Best Records</span>
+                  </button>
+                </li>
+              )}
               <li>
                 <a href="#games-catalogue" className="hover:text-cyan-400 transition-colors">
-                  All Games
+                  All Games Catalogue
                 </a>
               </li>
             </ul>
@@ -95,17 +98,12 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Bottom Line */}
-        <div className="border-t border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
+        <div className="border-t border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
           <p>© {new Date().getFullYear()} AwaisGames. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <a
-              href="https://awaisgames.netlify.app/"
-              className="text-slate-400 hover:text-cyan-300 font-mono"
-            >
-              awaisgames.netlify.app
-            </a>
+            <span className="text-slate-400">Zero Installs · Instant Play</span>
             <span className="text-slate-700">·</span>
-            <span>Single source of truth: <code className="text-slate-400 font-mono">games/</code></span>
+            <span>HTML5 & WebGL Graphics</span>
           </div>
         </div>
       </div>

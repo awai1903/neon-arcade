@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { DiscoveredGame } from '../types/game';
 import { GameCard } from './GameCard';
 import { Gamepad2, ArrowUpDown, X, Search, Sparkles } from 'lucide-react';
+import { triggerHaptic } from '../utils/haptics';
 
 interface GameGridProps {
   games: DiscoveredGame[];
@@ -12,7 +13,6 @@ interface GameGridProps {
   onSearchChange: (q: string) => void;
   onPlayGame: (id: string) => void;
   onShowInfo: (game: DiscoveredGame) => void;
-  onOpenDocs: () => void;
 }
 
 export const GameGrid: React.FC<GameGridProps> = ({
@@ -24,7 +24,6 @@ export const GameGrid: React.FC<GameGridProps> = ({
   onSearchChange,
   onPlayGame,
   onShowInfo,
-  onOpenDocs,
 }) => {
   const [sortBy, setSortBy] = useState<'featured' | 'az' | 'newest'>('featured');
 
@@ -74,9 +73,9 @@ export const GameGrid: React.FC<GameGridProps> = ({
   }, [games, activeCategory, searchQuery, sortBy]);
 
   return (
-    <section id="games-catalogue" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <section id="games-catalogue" className="mx-auto max-w-7xl 2xl:max-w-[1500px] px-3.5 py-6 sm:px-6 lg:px-8">
       {/* Category Navigation Bar & Sort Toolbar */}
-      <div className="flex flex-col gap-4 border-b border-slate-800 pb-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3.5 border-b border-slate-800 pb-4 md:flex-row md:items-center md:justify-between">
         {/* Category Pills with Real Counts */}
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {categories.map((cat) => {
@@ -85,8 +84,11 @@ export const GameGrid: React.FC<GameGridProps> = ({
             return (
               <button
                 key={cat}
-                onClick={() => onSelectCategory(cat)}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap ${
+                onClick={() => {
+                  triggerHaptic('selection');
+                  onSelectCategory(cat);
+                }}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-all whitespace-nowrap active:scale-95 touch-manipulation ${
                   isActive
                     ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
                     : 'bg-[#0a0f20] text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800'
@@ -94,7 +96,7 @@ export const GameGrid: React.FC<GameGridProps> = ({
               >
                 <span>{cat}</span>
                 <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                  className={`text-[10px] font-mono px-1 py-0.2 rounded ${
                     isActive ? 'bg-slate-950/20 text-slate-950 font-bold' : 'text-slate-500'
                   }`}
                 >
@@ -108,11 +110,11 @@ export const GameGrid: React.FC<GameGridProps> = ({
         {/* Right Sort & Stats */}
         <div className="flex items-center justify-between sm:justify-end gap-3">
           <span className="text-xs text-slate-400 font-mono">
-            {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'} available
+            {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'}
           </span>
 
-          <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#0a0f20] px-2.5 py-1.5 text-xs text-slate-300">
-            <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#0a0f20] px-2 py-1 text-xs text-slate-300">
+            <ArrowUpDown className="h-3 w-3 text-slate-400" />
             <select
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
@@ -144,9 +146,9 @@ export const GameGrid: React.FC<GameGridProps> = ({
         </div>
       )}
 
-      {/* Game Cards Grid */}
+      {/* Poki-style Pure Icon Grid */}
       {filteredGames.length > 0 ? (
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="mt-5 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2.5 sm:gap-3 md:gap-3.5">
           {filteredGames.map((game) => (
             <GameCard
               key={game.id}
@@ -175,15 +177,9 @@ export const GameGrid: React.FC<GameGridProps> = ({
                 onSearchChange('');
                 onSelectCategory('All');
               }}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-400 transition-colors"
+              className="rounded-lg bg-cyan-400 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-300 transition-colors"
             >
               Show All Games
-            </button>
-            <button
-              onClick={onOpenDocs}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700"
-            >
-              Add a Game via GitHub
             </button>
           </div>
         </div>
