@@ -88,9 +88,9 @@ const RecentGameTile: React.FC<RecentGameTileProps> = ({ game, timestamp, onPlay
       aria-label={`Resume playing ${manifest.title} in new tab (${formatRelativeTime(timestamp)})`}
     >
       <div
-        className={`relative aspect-square w-full overflow-hidden rounded-2xl border bg-[#0a0f20] shadow-sm transition-all duration-150 ease-out sm:hover:scale-105 sm:hover:border-purple-400/90 sm:hover:shadow-lg sm:hover:shadow-purple-500/30 group-focus-visible:ring-2 group-focus-visible:ring-purple-400 group-focus-visible:scale-105 active:scale-95 motion-reduce:transform-none ${
+        className={`relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl border bg-[#0a0f24] shadow-sm transition-all duration-200 ease-out sm:hover:scale-105 sm:hover:border-purple-400 sm:hover:shadow-lg sm:hover:shadow-purple-500/30 group-focus-visible:ring-2 group-focus-visible:ring-purple-400 group-focus-visible:scale-105 active:scale-95 motion-reduce:transform-none ${
           isPressed
-            ? 'scale-[0.94] border-purple-400 shadow-md shadow-purple-500/40 ring-1 ring-purple-400/50'
+            ? 'scale-[0.93] border-purple-400 shadow-md shadow-purple-500/40 ring-1 ring-purple-400/50'
             : 'border-slate-800/90'
         }`}
       >
@@ -99,12 +99,12 @@ const RecentGameTile: React.FC<RecentGameTileProps> = ({ game, timestamp, onPlay
             src={game.thumbnailUrl}
             alt={manifest.title}
             referrerPolicy="no-referrer"
-            className={`h-full w-full object-cover transition-transform duration-200 sm:group-hover:scale-110 motion-reduce:transform-none ${
+            className={`h-full w-full object-cover transition-transform duration-300 sm:group-hover:scale-110 motion-reduce:transform-none ${
               isPressed ? 'scale-105 brightness-110' : ''
             }`}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-slate-800 text-slate-500 text-xs font-bold">
+          <div className="flex h-full w-full items-center justify-center bg-slate-800 text-slate-400 text-sm font-bold">
             {manifest.title.slice(0, 2).toUpperCase()}
           </div>
         )}
@@ -112,22 +112,22 @@ const RecentGameTile: React.FC<RecentGameTileProps> = ({ game, timestamp, onPlay
         {/* Ambient Subtle Hover / Active Gloss Scrim */}
         <div
           className={`absolute inset-0 transition-colors duration-150 pointer-events-none ${
-            isPressed ? 'bg-purple-400/10' : 'bg-purple-400/0 sm:group-hover:bg-purple-400/5'
+            isPressed ? 'bg-purple-400/15' : 'bg-purple-400/0 sm:group-hover:bg-purple-400/10'
           }`}
         />
 
         {/* Corner Open New Tab Icon */}
         <div
-          className={`absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-950/80 text-purple-300 transition-opacity duration-150 shadow-sm backdrop-blur-sm border border-slate-800/80 ${
+          className={`absolute top-2 right-2 flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-slate-950/80 text-purple-300 transition-opacity duration-150 shadow-sm backdrop-blur-sm border border-slate-700/80 ${
             isPressed ? 'opacity-100 border-purple-400/50' : 'opacity-0 sm:group-hover:opacity-100'
           }`}
         >
-          <ExternalLink className="h-3 w-3" />
+          <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </div>
 
         {/* Subtle resume play pill overlay in corner */}
-        <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-purple-500 text-slate-950 shadow-md shadow-purple-900/50">
-          <Play className="h-3 w-3 fill-slate-950 ml-0.5" />
+        <div className="absolute bottom-2 right-2 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-purple-500 text-slate-950 shadow-md shadow-purple-900/50">
+          <Play className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-slate-950 ml-0.5" />
         </div>
       </div>
 

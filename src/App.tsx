@@ -11,6 +11,7 @@ import { HighScoresModal } from './components/HighScoresModal';
 import { LegalModals } from './components/LegalModals';
 import { NotFound } from './components/NotFound';
 import { Footer } from './components/Footer';
+import { FloatingBottomBar } from './components/FloatingBottomBar';
 
 const RECENT_GAMES_STORAGE_KEY = 'awaisgames_recent_games';
 const LEGACY_STORAGE_KEY = 'neon_arcade_recent_games';
@@ -26,6 +27,7 @@ export default function App() {
   // Search and Category state
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'hot' | 'featured'>('all');
 
   // Modals state
   const [isHighScoresOpen, setIsHighScoresOpen] = useState(false);
@@ -145,27 +147,44 @@ export default function App() {
     return activeGameId ? getGameById(activeGameId) : undefined;
   }, [activeGameId]);
 
+  // Game to display in the sticky bottom floating bar (most recent or top featured)
+  const bottomBarGame = useMemo(() => {
+    if (recentGamesList.length > 0) {
+      return recentGamesList[0].game;
+    }
+    return games.find((g) => g.isFeatured) || games[0];
+  }, [recentGamesList, games]);
+
   return (
-    <div className="min-h-screen bg-[#060913] text-slate-100 flex flex-col font-sans">
-      {/* Top Navbar */}
-      <Navbar
-        onNavigateHome={navigateHome}
-        onSelectGame={navigateToGame}
-        onOpenHighScores={() => setIsHighScoresOpen(true)}
-        games={games}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        activeCategory={activeCategory}
-        onSelectCategory={setActiveCategory}
-        categories={categories}
-      />
+    <div className="min-h-screen bg-[#060913] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Background ambient lighting accents */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-cyan-600/10 via-purple-600/5 to-transparent blur-3xl" />
+      </div>
+
+      {/* Poki-style Floating Pill Navbar */}
+      <div className="relative z-30">
+        <Navbar
+          onNavigateHome={navigateHome}
+          onSelectGame={navigateToGame}
+          onOpenHighScores={() => setIsHighScoresOpen(true)}
+          games={games}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          activeCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
+          categories={categories}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
+      </div>
 
       {/* Main View Area */}
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
         {currentRoute === 'home' && (
           <>
-            {/* Persistent Recently Played Strip (Last 3 games) if played */}
-            {!searchQuery && recentGamesList.length > 0 && (
+            {/* Persistent Recently Played Strip if games played */}
+            {!searchQuery && recentGamesList.length > 0 && activeFilter === 'all' && activeCategory === 'All' && (
               <RecentlyPlayed
                 recentGames={recentGamesList}
                 onPlayGame={navigateToGame}
@@ -174,7 +193,7 @@ export default function App() {
               />
             )}
 
-            {/* Prominent Poki-style Icon-First Game Grid */}
+            {/* Poki-style Pure Icon Grid with Featured Hero Top */}
             <GameGrid
               games={games}
               categories={categories}
@@ -184,7 +203,16 @@ export default function App() {
               onSearchChange={setSearchQuery}
               onPlayGame={navigateToGame}
               onShowInfo={(game) => setInspectedGame(game)}
+              activeFilter={activeFilter}
             />
+
+            {/* Sticky Floating Bottom Mini-Player Bar (matching reference video frames 04, 07, 10) */}
+            {bottomBarGame && (
+              <FloatingBottomBar
+                game={bottomBarGame}
+                onPlayGame={navigateToGame}
+              />
+            )}
           </>
         )}
 

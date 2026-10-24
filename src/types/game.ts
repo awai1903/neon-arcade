@@ -15,6 +15,7 @@ export interface GameManifest {
   version?: string;
   featured?: boolean;
   author?: string;
+  developer?: string;
   releaseDate?: string;
   tags?: string[];
   controls?: {

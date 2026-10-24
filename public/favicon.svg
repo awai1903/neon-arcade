@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f24" />
+      <stop offset="100%" stop-color="#050814" />
+    </linearGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="neonPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGrad)" stroke="#22d3ee" stroke-width="2" stroke-opacity="0.8" />
+
+  <!-- Inner glowing gamepad silhouette -->
+  <g filter="url(#glow)">
+    <!-- Controller Body -->
+    <path d="M18 24 C14 24 10 27 10 33 C10 41 15 45 20 45 C23 45 25 42 28 40 L36 40 C39 42 41 45 44 45 C49 45 54 41 54 33 C54 27 50 24 46 24 Z" 
+          fill="none" 
+          stroke="url(#neonCyan)" 
+          stroke-width="3" 
+          stroke-linejoin="round" />
+    
+    <!-- D-Pad Left -->
+    <path d="M19 31 L19 37 M16 34 L22 34" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Action Buttons Right -->
+    <circle cx="42" cy="32" r="1.8" fill="#ec4899" />
+    <circle cx="47" cy="35" r="1.8" fill="#a855f7" />
+    <circle cx="42" cy="38" r="1.8" fill="#22d3ee" />
+
+    <!-- Center Accent "A" Brand Gem -->
+    <path d="M32 28 L29 34 L35 34 Z" fill="url(#neonPurple)" />
+  </g>
+</svg>
