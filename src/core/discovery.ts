@@ -1,46 +1,71 @@
 import type { DiscoveredGame, GameManifest, GameModule } from '../types/game';
 
-// 1. Build-time discovery of all game.json manifests inside /games/*/
+// 1. Build-time discovery of all game manifests inside /games/**/
+// Supports both the repo's legacy `game.json` format and the current nested `config.json` layout.
 const manifestGlob = import.meta.glob<GameManifest | { default: GameManifest }>(
-  '/games/*/game.json',
+  ['/games/**/game.json', '/games/**/config.json'],
   { eager: true }
 );
 
 // 2. Discover thumbnails and root icons in individual game folders
 const imageGlob = import.meta.glob<string>(
-  '/games/*/*.{png,jpg,jpeg,webp,svg,gif}',
+  '/games/**/*.{png,jpg,jpeg,webp,svg,gif}',
   { eager: true, query: '?url', import: 'default' }
 );
 
 // 3. Discover game assets inside individual game assets/ subdirectories (nested branding, sprites, audio)
 const assetGlob = import.meta.glob<string>(
-  '/games/*/assets/**/*',
+  '/games/**/assets/**/*',
   { eager: true, query: '?url', import: 'default' }
 );
 
 // 4. Discover game-specific CSS styles
 const cssGlob = import.meta.glob<string>(
-  '/games/*/*.css',
+  '/games/**/*.css',
   { eager: true, query: '?inline', import: 'default' }
 );
 
 // 5. Discover executable JavaScript/TypeScript game modules (code-split dynamic imports)
 const moduleGlob = import.meta.glob<GameModule>(
-  '/games/*/*.{js,ts,jsx,tsx}'
+  '/games/**/*.{js,ts,jsx,tsx}'
 );
 
 // 6. Discover standalone HTML game entry points
 const htmlGlob = import.meta.glob<string>(
-  '/games/*/*.html',
+  '/games/**/*.html',
   { eager: true, query: '?url', import: 'default' }
 );
 
 /**
- * Normalizes relative path against folder
+ * Normalizes relative path against folder.
+ * folder may be nested like "arcade/bomb-blast".
  */
 function normalizeRelativePath(folder: string, relativePath: string): string {
   const cleanRel = relativePath.replace(/^\.?\//, '');
-  return `/games/${folder}/${cleanRel}`;
+  return `/games/${folder}/${cleanRel}`.replace(/\/+/g, '/');
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'game';
+}
+
+function titleCase(value: string): string {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function getFolderNameFromManifestPath(manifestPath: string): string {
+  return manifestPath
+    .replace(/^\/games\//, '')
+    .replace(/\/(?:game|config)\.json$/, '')
+    .trim();
 }
 
 /**
@@ -70,25 +95,47 @@ function generateFallbackIcon(title: string, category: string): string {
 }
 
 /**
- * Validates manifest metadata
+ * Validates manifest metadata.
+ * Handles both `game.json` and nested `config.json` structures.
  */
 function validateManifest(raw: any, folder: string): GameManifest | null {
   const data = raw?.default || raw;
   if (!data || typeof data !== 'object') {
-    console.warn(`[AwaisGames Discovery] Invalid or missing game.json in "games/${folder}"`);
+    console.warn(`[AwaisGames Discovery] Invalid or missing manifest in "games/${folder}"`);
     return null;
   }
 
-  const id = String(data.id || folder).trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-  const title = String(data.title || folder.replace(/[-_]/g, ' ')).trim();
-  const description = String(data.description || 'Fast, instant-play browser game.').trim();
-  const category = String(data.category || 'Arcade').trim();
-  const thumbnail = String(data.thumbnail || data.icon || './thumbnail.webp').trim();
-  const entry = String(data.entry || (data.html ? 'index.html' : 'game.js')).trim();
+  const folderParts = folder.split('/');
+  const lastFolder = folderParts[folderParts.length - 1] || 'game';
+  const fallbackCategory = folderParts.length > 1 ? folderParts[0] : 'Arcade';
+
+  const id = String(data.id || data.slug || lastFolder).trim();
+  const title = String(data.title || data.name || titleCase(lastFolder.replace(/[-_]/g, ' '))).trim();
+  const description = String(
+    data.description ||
+      data.summary ||
+      data.meta?.description ||
+      `Instant-play browser game in ${titleCase(fallbackCategory)}.`
+  ).trim();
+  const category = String(
+    data.category ||
+      data.genre ||
+      titleCase(fallbackCategory || 'Arcade')
+  ).trim();
+  const thumbnail = String(
+    data.thumbnail ||
+      data.icon ||
+      data.cover ||
+      data.images2?.background ||
+      data.images1?.enemyA ||
+      data.images1?.player ||
+      './thumbnail.webp'
+  ).trim();
+  const entry = String(data.entry || data.html || 'index.html').trim();
 
   return {
     ...data,
-    id,
+    id: slugify(id),
     title,
     description,
     category,
@@ -98,67 +145,75 @@ function validateManifest(raw: any, folder: string): GameManifest | null {
 }
 
 /**
- * Parses, validates, and registers all games discovered across games/* at build-time.
- * Scalable: simply adding a folder to /games/ with game.json auto-registers the game.
+ * Parses, validates, and registers all games discovered across games/** at build-time.
  */
 export function discoverGames(): DiscoveredGame[] {
   const discovered: DiscoveredGame[] = [];
   const seenIds = new Set<string>();
 
   for (const [manifestPath, rawContent] of Object.entries(manifestGlob)) {
-    // Extract folder name: e.g. /games/endless-runner/game.json -> endless-runner
-    const match = manifestPath.match(/\/games\/([^/]+)\/game\.json$/);
-    if (!match) continue;
+    const folderName = getFolderNameFromManifestPath(manifestPath);
+    if (!folderName) continue;
 
-    const folderName = match[1];
     const manifest = validateManifest(rawContent, folderName);
     if (!manifest) continue;
 
-    // Deduplicate game IDs
-    let uniqueId = manifest.id;
+    const baseFolderName = folderName.split('/').at(-1) || folderName;
+    let uniqueId = slugify(manifest.id || baseFolderName);
     if (seenIds.has(uniqueId)) {
       console.warn(`[AwaisGames Discovery] Duplicate game ID detected: "${uniqueId}". Deduplicating with folder name "${folderName}".`);
-      uniqueId = `${manifest.id}-${folderName}`;
+      uniqueId = `${slugify(manifest.id || baseFolderName)}-${slugify(baseFolderName)}`;
     }
     seenIds.add(uniqueId);
 
-    // Determine entry point type (.html vs .js/.ts module)
-    const isHtmlEntry = manifest.entry.endsWith('.html');
-    const targetEntryPath = normalizeRelativePath(folderName, manifest.entry);
-    let entryType: 'html' | 'module' = isHtmlEntry ? 'html' : 'module';
-    let htmlUrl: string | undefined = undefined;
-    let entryLoader = moduleGlob[targetEntryPath];
+    const entryPathCandidates = [
+      manifest.entry,
+      manifest.entry.split('/').at(-1) || manifest.entry,
+      'index.html',
+    ]
+      .filter(Boolean)
+      .map((candidate) => normalizeRelativePath(folderName, candidate))
+      .filter((value, index, arr) => arr.indexOf(value) === index);
 
-    if (isHtmlEntry) {
-      htmlUrl = htmlGlob[targetEntryPath] || undefined;
-      if (!htmlUrl) {
+    let entryType: 'html' | 'module' = manifest.entry.toLowerCase().endsWith('.html') ? 'html' : 'module';
+    let htmlUrl: string | undefined = undefined;
+    let entryLoader: (() => Promise<GameModule>) | undefined = undefined;
+    let resolvedEntryPath = entryPathCandidates[0];
+
+    const htmlMatch = entryPathCandidates.find((candidatePath) => Boolean(htmlGlob[candidatePath]));
+    const moduleMatch = entryPathCandidates.find((candidatePath) => Boolean(moduleGlob[candidatePath]));
+
+    if (htmlMatch) {
+      entryType = 'html';
+      htmlUrl = htmlGlob[htmlMatch];
+      resolvedEntryPath = htmlMatch;
+    } else if (moduleMatch) {
+      entryType = 'module';
+      entryLoader = () => moduleGlob[moduleMatch]();
+      resolvedEntryPath = moduleMatch;
+    } else if (entryType === 'html') {
+      console.warn(
+        `[AwaisGames Discovery] Skipping game "${manifest.title}" (games/${folderName}): HTML entry point "${manifest.entry}" not found.`
+      );
+      continue;
+    } else {
+      const fallbackHtml = normalizeRelativePath(folderName, 'index.html');
+      if (htmlGlob[fallbackHtml]) {
+        entryType = 'html';
+        htmlUrl = htmlGlob[fallbackHtml];
+        resolvedEntryPath = fallbackHtml;
+      } else {
         console.warn(
-          `[AwaisGames Discovery] Skipping game "${manifest.title}" (games/${folderName}): HTML entry point "${manifest.entry}" not found at "${targetEntryPath}".`
+          `[AwaisGames Discovery] Skipping game "${manifest.title}" (games/${folderName}): Entry module "${manifest.entry}" not found.`
         );
         continue;
       }
-    } else {
-      if (!entryLoader) {
-        // Fallback: check if index.html exists instead
-        const fallbackHtml = normalizeRelativePath(folderName, 'index.html');
-        if (htmlGlob[fallbackHtml]) {
-          entryType = 'html';
-          htmlUrl = htmlGlob[fallbackHtml];
-        } else {
-          console.warn(
-            `[AwaisGames Discovery] Skipping game "${manifest.title}" (games/${folderName}): Entry module "${manifest.entry}" not found at "${targetEntryPath}".`
-          );
-          continue;
-        }
-      }
     }
 
-    // Resolve Thumbnail / Square Icon
     const targetThumbPath = normalizeRelativePath(folderName, manifest.thumbnail);
     let resolvedThumbnail = imageGlob[targetThumbPath] || '';
     let hasValidThumbnail = Boolean(resolvedThumbnail);
 
-    // If not matched, search for any image in the game folder root
     if (!hasValidThumbnail) {
       for (const [imgPath, url] of Object.entries(imageGlob)) {
         if (imgPath.startsWith(`/games/${folderName}/`)) {
@@ -169,7 +224,6 @@ export function discoverGames(): DiscoveredGame[] {
       }
     }
 
-    // Scoped Game Assets (assets/ subfolder)
     const folderAssetPrefix = `/games/${folderName}/assets/`;
     const gameAssets: Record<string, string> = {};
     let logoUrl: string | undefined = undefined;
@@ -180,7 +234,6 @@ export function discoverGames(): DiscoveredGame[] {
         const relativeKey = assetPath.slice(`/games/${folderName}/`.length);
         gameAssets[relativeKey] = bundledUrl;
 
-        // Auto-detect branding icons
         if (relativeKey.includes('logo.') || relativeKey.includes('logo-')) {
           logoUrl = bundledUrl;
         }
@@ -194,27 +247,25 @@ export function discoverGames(): DiscoveredGame[] {
       }
     }
 
-    // If still no valid thumbnail, generate responsive branded SVG fallback
     if (!hasValidThumbnail) {
       resolvedThumbnail = generateFallbackIcon(manifest.title, manifest.category);
       hasValidThumbnail = true;
     }
 
-    // Scoped CSS Stylesheet (optional)
     const targetCssPath = manifest.style
       ? normalizeRelativePath(folderName, manifest.style)
-      : `/games/${folderName}/game.css`;
+      : (() => {
+          const directPath = normalizeRelativePath(folderName, 'game.css');
+          return cssGlob[directPath] ? directPath : `/games/${folderName}/style.css`;
+        })();
     const rawCss = cssGlob[targetCssPath] || undefined;
 
-    // Module loader wrapper
     const loadEntryModule = async (): Promise<GameModule> => {
       if (entryType === 'html') {
         return {};
       }
       if (!entryLoader) {
-        throw new Error(
-          `Entry module "${manifest.entry}" not found in "games/${folderName}/".`
-        );
+        throw new Error(`Entry module "${resolvedEntryPath}" not found in "games/${folderName}/".`);
       }
       return await entryLoader();
     };
@@ -246,7 +297,6 @@ export function discoverGames(): DiscoveredGame[] {
     });
   }
 
-  // Sort: Featured titles first, then alphabetical by title
   return discovered.sort((a, b) => {
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
@@ -260,7 +310,7 @@ export function discoverGames(): DiscoveredGame[] {
 export const gameCatalogue: DiscoveredGame[] = discoverGames();
 
 export function getGameById(id: string): DiscoveredGame | undefined {
-  return gameCatalogue.find((g) => g.id === id || g.folderName === id);
+  return gameCatalogue.find((g) => g.id === id || g.folderName === id || g.folderName.endsWith(`/${id}`));
 }
 
 export function getAllCategories(): string[] {
