@@ -42,6 +42,14 @@ h1, h2, h3, h4, .font-display {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
+/* Hide scrollbar on horizontal chip rows */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -75,4 +83,87 @@ input:focus-visible,
 select:focus-visible {
   outline: 2px solid #00d4ff;
   outline-offset: 2px;
+}
+
+/* ==========================================================================
+   LIGHT THEME
+   The whole site was authored dark-first. Instead of touching every component,
+   the light theme remaps the slate/cyan palette variables and the hard-coded
+   dark surface colours. Toggle: <html class="light"> (see src/utils/theme.ts)
+   ========================================================================== */
+html.light {
+  color-scheme: light;
+
+  /* Text shades (light text in dark mode -> dark text in light mode) */
+  --color-slate-50: #0f172a;
+  --color-slate-100: #1e293b;
+  --color-slate-200: #334155;
+  --color-slate-300: #475569;
+  --color-slate-400: #64748b;
+
+  /* Surface / border shades (dark in dark mode -> light in light mode) */
+  --color-slate-600: #94a3b8;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #ffffff;
+
+  /* Accent text needs more contrast on a light background */
+  --color-cyan-200: #0e7490;
+  --color-cyan-300: #0891b2;
+  --color-cyan-400: #0891b2;
+}
+
+html.light body {
+  background-color: #eef2fb;
+  color: #0f172a;
+}
+
+/* Hard-coded dark surfaces */
+html.light [class*="bg-[#060913"] {
+  background-color: #eef2fb;
+}
+html.light [class*="bg-[#0c1226"],
+html.light [class*="bg-[#0a0f24"],
+html.light [class*="bg-[#0a0f20"] {
+  background-color: #ffffff;
+}
+html.light [class*="bg-[#0e152d"] {
+  background-color: #f4f7ff;
+}
+html.light [class*="bg-[#131c3c"] {
+  background-color: #e6ecfb;
+}
+
+/* Translucent variants (e.g. bg-[#0c1226]/95) keep a touch of see-through */
+html.light [class*="bg-[#060913]/"] {
+  background-color: rgba(238, 242, 251, 0.88);
+}
+html.light [class*="bg-[#0c1226]/"],
+html.light [class*="bg-[#0a0f24]/"],
+html.light [class*="bg-[#0a0f20]/"],
+html.light [class*="bg-[#0e152d]/"] {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+html.light [class*="border-[#1a2342"] {
+  border-color: #dbe3f5;
+}
+
+/* Headings that were white on dark (but not text sitting on a coloured button) */
+html.light .text-white:not([class*="bg-"]):not([class*="from-"]) {
+  color: #0f172a;
+}
+html.light [class*="hover:text-white"]:hover {
+  color: #0f172a;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #eef2fb;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #c3cde6;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #a9b6d8;
 }
