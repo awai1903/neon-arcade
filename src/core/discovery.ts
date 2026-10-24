@@ -1,9 +1,8 @@
 import type { DiscoveredGame, GameManifest, GameModule } from '../types/game';
 
-// 1. Build-time discovery of all game manifests inside /games/**/
-// Supports both the repo's legacy `game.json` format and the current nested `config.json` layout.
+// Prefer config.json when it exists in a game folder, and fall back to legacy game.json.
 const manifestGlob = import.meta.glob<GameManifest | { default: GameManifest }>(
-  ['/games/**/game.json', '/games/**/config.json'],
+  ['/games/**/config.json', '/games/**/game.json'],
   { eager: true }
 );
 
@@ -96,7 +95,7 @@ function generateFallbackIcon(title: string, category: string): string {
 
 /**
  * Validates manifest metadata.
- * Handles both `game.json` and nested `config.json` structures.
+ * Handles both `config.json` and legacy `game.json` structures.
  */
 function validateManifest(raw: any, folder: string): GameManifest | null {
   const data = raw?.default || raw;
@@ -151,10 +150,27 @@ export function discoverGames(): DiscoveredGame[] {
   const discovered: DiscoveredGame[] = [];
   const seenIds = new Set<string>();
 
+  const manifestEntries = new Map<string, [string, any]>();
   for (const [manifestPath, rawContent] of Object.entries(manifestGlob)) {
     const folderName = getFolderNameFromManifestPath(manifestPath);
     if (!folderName) continue;
 
+    const existing = manifestEntries.get(folderName);
+    if (!existing) {
+      manifestEntries.set(folderName, [manifestPath, rawContent]);
+      continue;
+    }
+
+    const currentIsConfig = manifestPath.endsWith('/config.json');
+    const previousIsConfig = existing[0].endsWith('/config.json');
+
+    if (currentIsConfig && !previousIsConfig) {
+      manifestEntries.set(folderName, [manifestPath, rawContent]);
+    }
+  }
+
+  for (const [manifestPath, rawContent] of manifestEntries.values()) {
+    const folderName = getFolderNameFromManifestPath(manifestPath);
     const manifest = validateManifest(rawContent, folderName);
     if (!manifest) continue;
 
