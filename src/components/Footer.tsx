@@ -33,12 +33,6 @@ export const Footer: React.FC<FooterProps> = ({
             <p className="max-w-sm text-xs text-slate-400 leading-relaxed">
               Curated, high-performance browser gaming platform. Enjoy action, arcade shmups, 3D speedrunners, and puzzle challenges directly in your browser.
             </p>
-            <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Instant Play · No Downloads Required</span>
-              <span>·</span>
-              <span className="font-mono text-slate-300">{gameCount} Games Available</span>
-            </div>
           </div>
 
           {/* Platform Links */}
@@ -100,11 +94,6 @@ export const Footer: React.FC<FooterProps> = ({
         {/* Bottom Line */}
         <div className="border-t border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
           <p>© {new Date().getFullYear()} AwaisGames. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <span className="text-slate-400">Zero Installs · Instant Play</span>
-            <span className="text-slate-700">·</span>
-            <span>HTML5 & WebGL Graphics</span>
-          </div>
         </div>
       </div>
     </footer>
