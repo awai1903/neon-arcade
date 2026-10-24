@@ -1,97 +1,270 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const rootDir = path.resolve(__dirname, '..');
 const gamesDir = path.join(rootDir, 'games');
 
-console.log('🎮 [AwaisGames] Validating game catalogue directory: games/');
+console.log('🎮 [AwaisGames] Validating games...');
 
 if (!fs.existsSync(gamesDir)) {
-  console.error('❌ Error: games/ directory not found at', gamesDir);
+  console.error('❌ Error: games/ directory not found.');
   process.exit(1);
 }
 
-const entries = fs.readdirSync(gamesDir, { withFileTypes: true });
-const gameFolders = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+// Normalize IDs for duplicate checking
+function slugify(value) {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'game';
+}
 
-console.log(`🔍 Found ${gameFolders.length} game folders to validate.`);
+// Recursively discover config.json and game.json files
+function findManifests(directory) {
+  const manifests = [];
 
-const seenIds = new Set();
-let hasErrors = false;
-const validGames = [];
+  for (const entry of fs.readdirSync(directory, {
+    withFileTypes: true,
+  })) {
+    if (!entry.isDirectory()) continue;
 
-for (const folder of gameFolders) {
-  const folderPath = path.join(gamesDir, folder);
-  const manifestPath = path.join(folderPath, 'game.json');
+    const folderPath = path.join(directory, entry.name);
+    const configPath = path.join(folderPath, 'config.json');
+    const gamePath = path.join(folderPath, 'game.json');
 
-  if (!fs.existsSync(manifestPath)) {
-    console.warn(`⚠️  [Skip] "games/${folder}": Missing game.json manifest.`);
-    continue;
+    // Prefer config.json over legacy game.json
+    if (fs.existsSync(configPath)) {
+      manifests.push({
+        folderPath,
+        manifestPath: configPath,
+      });
+    } else if (fs.existsSync(gamePath)) {
+      manifests.push({
+        folderPath,
+        manifestPath: gamePath,
+      });
+    }
+
+    // Scan nested folders, including category folders
+    manifests.push(...findManifests(folderPath));
   }
+
+  return manifests;
+}
+
+const manifestFiles = findManifests(gamesDir);
+
+console.log(
+  `🔍 Found ${manifestFiles.length} game manifest(s).`
+);
+
+const seenIds = new Map();
+const validGames = [];
+let hasErrors = false;
+
+for (const { folderPath, manifestPath } of manifestFiles) {
+  const folder = path
+    .relative(rootDir, folderPath)
+    .split(path.sep)
+    .join('/');
 
   let manifest;
+
+  // Read and parse JSON safely
   try {
-    const raw = fs.readFileSync(manifestPath, 'utf8');
-    manifest = JSON.parse(raw);
-  } catch (err) {
-    console.error(`❌ [Error] "games/${folder}/game.json" contains invalid JSON:`, err.message);
+    manifest = JSON.parse(
+      fs.readFileSync(manifestPath, 'utf8')
+    );
+  } catch (error) {
+    console.error(
+      `❌ [Invalid JSON] ${manifestPath}: ${error.message}`
+    );
     hasErrors = true;
     continue;
   }
 
-  // 1. Validate ID
-  const gameId = manifest.id || folder;
+  if (
+    !manifest ||
+    typeof manifest !== 'object' ||
+    Array.isArray(manifest)
+  ) {
+    console.error(
+      `❌ [Invalid Manifest] ${manifestPath}`
+    );
+    hasErrors = true;
+    continue;
+  }
+
+  const fallbackFolderName = path.basename(folderPath);
+
+  const gameId = slugify(
+    manifest.id ||
+    manifest.slug ||
+    fallbackFolderName
+  );
+
+  const title = String(
+    manifest.title || manifest.name || ''
+  ).trim();
+
+  // Check duplicate IDs
   if (seenIds.has(gameId)) {
-    console.error(`❌ [Duplicate] Game ID "${gameId}" in "games/${folder}" is already used.`);
-    hasErrors = true;
-    continue;
-  }
-  seenIds.add(gameId);
+    console.error(
+      `❌ [Duplicate ID] "${gameId}" found in ` +
+      `"${seenIds.get(gameId)}" and "${folder}".`
+    );
 
-  // 2. Validate Title
-  if (!manifest.title) {
-    console.error(`❌ [Error] "games/${folder}": Missing required field "title" in game.json.`);
     hasErrors = true;
-    continue;
+  } else {
+    seenIds.set(gameId, folder);
   }
 
-  // 3. Validate Entry file
-  const entryFile = manifest.entry || (fs.existsSync(path.join(folderPath, 'index.html')) ? 'index.html' : 'game.js');
-  const entryPath = path.join(folderPath, entryFile);
-  if (!fs.existsSync(entryPath)) {
-    console.error(`❌ [Missing Entry] "games/${folder}": Entry file "${entryFile}" not found.`);
+  // Check required title
+  if (!title) {
+    console.error(
+      `❌ [Missing Title] ${manifestPath} needs a title.`
+    );
+
     hasErrors = true;
     continue;
   }
 
-  // 4. Validate Thumbnail / Icon
-  const thumbFile = manifest.thumbnail || manifest.icon || 'thumbnail.webp';
-  const thumbPath = path.join(folderPath, thumbFile);
-  const hasThumbnail = fs.existsSync(thumbPath);
+  // Determine game entry file
+  const entryFile = String(
+    manifest.entry ||
+    manifest.html ||
+    (
+      fs.existsSync(
+        path.join(folderPath, 'index.html')
+      )
+        ? 'index.html'
+        : 'game.js'
+    )
+  ).trim();
+
+  // Ensure entry stays inside its own game folder
+  const resolvedFolder = path.resolve(folderPath);
+  const resolvedEntry = path.resolve(
+    folderPath,
+    entryFile
+  );
+
+  const relativeEntry = path.relative(
+    resolvedFolder,
+    resolvedEntry
+  );
+
+  const entryIsInsideGameFolder =
+    relativeEntry !== '..' &&
+    !relativeEntry.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(relativeEntry);
+
+  if (!entryIsInsideGameFolder) {
+    console.error(
+      `❌ [Unsafe Entry] ${folder}: "${entryFile}"`
+    );
+
+    hasErrors = true;
+    continue;
+  }
+
+  // Check entry file exists
+  if (
+    !fs.existsSync(resolvedEntry) ||
+    !fs.statSync(resolvedEntry).isFile()
+  ) {
+    console.error(
+      `❌ [Missing Entry] ${folder}: ` +
+      `"${entryFile}" was not found.`
+    );
+
+    hasErrors = true;
+    continue;
+  }
+
+  // Check optional thumbnail
+  const thumbnail = String(
+    manifest.thumbnail ||
+    manifest.icon ||
+    'thumbnail.webp'
+  ).trim();
+
+  const resolvedThumbnail = path.resolve(
+    folderPath,
+    thumbnail
+  );
+
+  const thumbnailRelative = path.relative(
+    resolvedFolder,
+    resolvedThumbnail
+  );
+
+  const thumbnailInsideGameFolder =
+    thumbnailRelative !== '..' &&
+    !thumbnailRelative.startsWith(`..${path.sep}`) &&
+    !path.isAbsolute(thumbnailRelative);
+
+  const hasThumbnail =
+    thumbnailInsideGameFolder &&
+    fs.existsSync(resolvedThumbnail) &&
+    fs.statSync(resolvedThumbnail).isFile();
+
   if (!hasThumbnail) {
-    console.warn(`⚠️  [Notice] "games/${folder}": Thumbnail file "${thumbFile}" not found; automated SVG fallback will be used.`);
+    console.warn(
+      `⚠️ [No Thumbnail] ${folder}: ` +
+      `fallback artwork may be used.`
+    );
   }
 
   validGames.push({
-    folder,
     id: gameId,
-    title: manifest.title,
-    category: manifest.category || 'Arcade',
+    title,
+    category:
+      manifest.category ||
+      manifest.genre ||
+      'Arcade',
+    folder,
+    manifest: path
+      .relative(rootDir, manifestPath)
+      .split(path.sep)
+      .join('/'),
     entry: entryFile,
-    type: entryFile.endsWith('.html') ? 'HTML (iframe)' : 'Module (Canvas/Phaser)',
-    thumbnail: hasThumbnail ? thumbFile : 'SVG Fallback',
+    type: entryFile.toLowerCase().endsWith('.html')
+      ? 'Standalone HTML'
+      : 'JavaScript module',
+    thumbnail: hasThumbnail
+      ? thumbnail
+      : 'Fallback artwork',
   });
 }
 
-console.log('\n📊 === Game Discovery Validation Summary ===');
+// Print validation results
+console.log('\n📊 === Game Validation Summary ===');
+
 console.table(validGames);
 
-if (hasErrors) {
-  console.error('\n❌ Game validation finished with errors. Please fix missing files or duplicates.');
+if (manifestFiles.length === 0) {
+  console.error(
+    '❌ No game manifests found. Add config.json or ' +
+    'game.json inside a game folder.'
+  );
+
   process.exit(1);
-} else {
-  console.log(`\n✅ All ${validGames.length} games verified and ready for automatic discovery!\n`);
 }
+
+if (hasErrors) {
+  console.error(
+    '\n❌ Validation failed. Fix the errors above.'
+  );
+
+  process.exit(1);
+}
+
+console.log(
+  `\n✅ Successfully validated ${validGames.length} game(s).\n`
+);

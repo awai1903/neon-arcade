@@ -1,0 +1,9 @@
+
+{
+  "id": "dream-weaver",
+  "title": "Dream Weaver",
+  "category": "Arcade",
+  "description": "A dream-themed browser game.",
+  "entry": "index.html",
+  "thumbnail": "./assets/images/player.png"
+}
